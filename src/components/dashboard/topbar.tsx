@@ -5,7 +5,11 @@ import { LogOut, ExternalLink } from 'lucide-react';
 import type { Profile } from '@/types';
 import Link from 'next/link';
 
-export function DashboardTopbar({ profile }: { profile: Profile }) {
+export function DashboardTopbar({
+  profile,
+}: {
+  profile: Profile;
+}) {
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 11) return 'Selamat pagi';

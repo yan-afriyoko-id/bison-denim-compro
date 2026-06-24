@@ -1,12 +1,32 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { login } from '@/actions/auth.actions';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(login, undefined);
+  const [siteName, setSiteName] = useState('Bison Denim');
+  const [logoUrl, setLogoUrl] = useState('/icon.png');
+
+  useEffect(() => {
+    const el = document.querySelector('[data-site-name]') as HTMLElement | null;
+    if (el?.dataset.siteName) setSiteName(el.dataset.siteName);
+    if (el?.dataset.logoUrl) setLogoUrl(el.dataset.logoUrl);
+  }, []);
+
+  useEffect(() => {
+    createClient().auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.push('/dashboard');
+      }
+    });
+  }, [router]);
 
   return (
     <section className="relative grid min-h-screen lg:grid-cols-2">
@@ -14,7 +34,7 @@ export default function LoginPage() {
       <div className="relative hidden lg:block">
         <Image
           src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1400&q=80"
-          alt="Bison Denim"
+          alt={siteName}
           fill
           className="object-cover"
           priority
@@ -22,14 +42,14 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 flex flex-col justify-between p-12">
           <span className="text-white/70 text-xs font-bold uppercase tracking-[0.2em]">
-            Sejak 1998
+            Admin Dashboard
           </span>
           <div>
             <h2 className="text-white text-5xl xl:text-6xl font-bold tracking-tight leading-none">
-              BISON DENIM
+              {siteName.toUpperCase()}
             </h2>
             <p className="text-white/80 text-base mt-4 max-w-md leading-relaxed">
-              Sistem manajemen konten untuk tim Bison Denim.
+              Sistem manajemen konten untuk tim {siteName}.
             </p>
           </div>
         </div>
@@ -41,18 +61,15 @@ export default function LoginPage() {
           <Link href="/" className="flex items-center gap-3 mb-12">
             <div className="relative h-10 w-10 overflow-hidden">
               <Image
-                src="/icon.png"
-                alt="Bison Denim logo"
+                src={logoUrl}
+                alt={`${siteName} logo`}
                 fill
                 className="object-contain"
               />
             </div>
             <div>
               <div className="text-sm font-bold text-black tracking-tight uppercase">
-                Bison Denim
-              </div>
-              <div className="text-[10px] text-[#555] tracking-wider -mt-0.5 uppercase">
-                Since 1998
+                {siteName}
               </div>
             </div>
           </Link>

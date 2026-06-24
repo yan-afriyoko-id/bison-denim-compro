@@ -4,40 +4,48 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import type { Profile } from '@/types';
+import type { DashboardModuleKey, Profile } from '@/types';
 import {
   LayoutDashboard,
   FileText,
   Briefcase,
-  FolderKanban,
   Newspaper,
   Image as ImageIcon,
-  MessageSquare,
   Users,
   Settings,
   ScrollText,
   ChevronLeft,
   Presentation,
+  MenuSquare,
 } from 'lucide-react';
 import { useState } from 'react';
+import { hasDashboardModuleAccess } from '@/lib/permissions';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/hero', label: 'Hero Slider', icon: Presentation },
-  { href: '/dashboard/pages', label: 'Pages', icon: FileText },
-  { href: '/dashboard/services', label: 'Services', icon: Briefcase },
-  { href: '/dashboard/posts', label: 'Posts', icon: Newspaper },
-  { href: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
-  { href: '/dashboard/media', label: 'Media', icon: ImageIcon },
-  { href: '/dashboard/leads', label: 'Leads', icon: MessageSquare },
-  { href: '/dashboard/users', label: 'Users', icon: Users },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
-  { href: '/dashboard/audit-logs', label: 'Audit Logs', icon: ScrollText },
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, moduleKey: 'overview' as DashboardModuleKey },
+  { href: '/dashboard/hero', label: 'Hero Slider', icon: Presentation, moduleKey: 'hero' as DashboardModuleKey },
+  { href: '/dashboard/pages', label: 'Pages', icon: FileText, moduleKey: 'pages' as DashboardModuleKey },
+  { href: '/dashboard/services', label: 'Services', icon: Briefcase, moduleKey: 'services' as DashboardModuleKey },
+  { href: '/dashboard/posts', label: 'Posts', icon: Newspaper, moduleKey: 'posts' as DashboardModuleKey },
+  { href: '/dashboard/navigation', label: 'Navigation', icon: MenuSquare, moduleKey: 'navigation' as DashboardModuleKey },
+  { href: '/dashboard/media', label: 'Media', icon: ImageIcon, moduleKey: 'media' as DashboardModuleKey },
+  { href: '/dashboard/users', label: 'Users', icon: Users, moduleKey: 'users' as DashboardModuleKey },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings, moduleKey: 'settings' as DashboardModuleKey },
+  { href: '/dashboard/audit-logs', label: 'Audit Logs', icon: ScrollText, moduleKey: 'audit_logs' as DashboardModuleKey },
 ];
 
-export function DashboardSidebar({ profile }: { profile: Profile }) {
+export function DashboardSidebar({
+  profile,
+  siteName = 'Bison Denim',
+  logoUrl = '/icon.png',
+}: {
+  profile: Profile;
+  siteName?: string;
+  logoUrl?: string;
+}) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const visibleNavItems = navItems.filter((item) => hasDashboardModuleAccess(profile, item.moduleKey));
 
   return (
     <aside
@@ -52,14 +60,14 @@ export function DashboardSidebar({ profile }: { profile: Profile }) {
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="relative h-7 w-7 overflow-hidden">
               <Image
-                src="/icon.png"
-                alt="Bison Denim"
+                src={logoUrl}
+                alt={siteName}
                 fill
                 className="object-contain"
               />
             </div>
             <span className="text-sm font-bold text-[#f5f5f5] tracking-tight uppercase">
-              Bison Denim
+              {siteName}
             </span>
           </Link>
         )}
@@ -73,11 +81,12 @@ export function DashboardSidebar({ profile }: { profile: Profile }) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = item.href === '/dashboard'
             ? pathname === '/dashboard'
             : pathname === item.href || pathname.startsWith(item.href + '/');
           const Icon = item.icon;
+          const badgeCount = 0;
 
           return (
             <Link
@@ -93,6 +102,11 @@ export function DashboardSidebar({ profile }: { profile: Profile }) {
             >
               <Icon className="h-4 w-4 shrink-0" />
               {!collapsed && <span>{item.label}</span>}
+              {!collapsed && badgeCount > 0 && (
+                <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                  {badgeCount}
+                </span>
+              )}
             </Link>
           );
         })}

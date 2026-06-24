@@ -3,11 +3,13 @@
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { cn } from '@/lib/utils';
-import { Search, ChevronDown, Globe, Menu, X } from 'lucide-react';
+import { Search, ChevronDown, Globe, Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { SearchOverlay } from './search-overlay';
+import { createClient } from '@/lib/supabase/client';
+import type { PublicNavItem } from '@/lib/public-content';
 
 const SOURCE_LANGUAGE = 'id';
 const GOOGLE_TRANSLATE_COOKIE = 'googtrans';
@@ -144,44 +146,45 @@ function syncGoogleTranslateState(locale: LocaleKey) {
   triggerGoogleTranslate(targetLanguage);
 }
 
-const NAV_LINKS: { href: string; label: string; children?: { href: string; label: string }[] }[] = [
-  { href: '/', label: 'Beranda' },
-  {
-    href: '/about/company-information',
-    label: 'Tentang',
-    children: [
-      { href: '/about/company-information', label: 'Informasi Perusahaan' },
-    ],
-  },
-  {
-    href: '/services',
-    label: 'Produk',
-    children: [
-      { href: '/services/denim-collection', label: 'Denim Collection' },
-      { href: '/services/custom-tailoring', label: 'Kemeja' },
-      { href: '/services/wholesale-supply', label: 'Hoodie & Sweater' },
-      { href: '/services/sustainable-fashion', label: 'Aksesori Fashion' },
-      { href: '/services/brand-collaboration', label: 'Produk Lainnya' },
-    ],
-  },
-  { href: '/news', label: 'Berita' },
-  { href: '/contact-us', label: 'Kontak' },
-];
+function isInternalHref(href: string) {
+  return href.startsWith('/');
+}
 
-export function Header() {
+export function Header({
+  navigation,
+  siteName,
+  logoUrl,
+}: {
+  navigation: PublicNavItem[];
+  siteName: string;
+  logoUrl: string;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [activeLocale, setActiveLocale] = useState<LocaleKey>('id');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const langRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    createClient().auth.getSession().then(({ data }) => {
+      setIsLoggedIn(!!data.session);
+    });
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
       }
       let shouldClose = true;
       dropdownRefs.current.forEach((ref) => {
@@ -194,7 +197,9 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    setActiveLocale(getPreferredLocale());
+    queueMicrotask(() => {
+      setActiveLocale(getPreferredLocale());
+    });
   }, []);
 
   useEffect(() => {
@@ -231,6 +236,7 @@ export function Header() {
   }, []);
 
   const isActive = (href: string) => {
+    if (!isInternalHref(href)) return false;
     if (href === '/') return pathname === '/';
     return pathname === href || pathname.startsWith(href + '/');
   };
@@ -263,8 +269,8 @@ export function Header() {
           <Link href="/" className="navbar-interactive flex items-center gap-3 flex-shrink-0 rounded-sm">
             <div className="relative h-10 w-10 overflow-hidden">
               <Image
-                src="/icon.png"
-                alt="Bison Denim logo"
+                src={logoUrl}
+                alt={`${siteName} logo`}
                 fill
                 className="object-contain"
                 priority
@@ -272,31 +278,30 @@ export function Header() {
             </div>
             <div>
               <div className="text-sm font-bold text-black tracking-tight uppercase">
-                Bison Denim
-              </div>
-              <div className="text-[10px] text-[#555] tracking-wider -mt-0.5 uppercase">
-                Since 1998
+                {siteName}
               </div>
             </div>
           </Link>
 
           <nav className="hidden md:flex items-center h-full">
-            {NAV_LINKS.map((link) => {
-              const hasChildren = link.children && link.children.length > 0;
-              const isDropdownOpen = openDropdown === link.label;
+            {navigation.map((link) => {
+              const hasChildren = link.children.length > 0;
+              const isDropdownOpen = openDropdown === link.id;
 
               return (
                 <div
-                  key={link.label}
+                  key={link.id}
                   ref={(el) => {
-                    if (hasChildren) dropdownRefs.current.set(link.label, el);
+                    if (hasChildren) dropdownRefs.current.set(link.id, el);
                   }}
                   className="relative h-full flex items-center"
-                  onMouseEnter={() => hasChildren && setOpenDropdown(link.label)}
+                  onMouseEnter={() => hasChildren && setOpenDropdown(link.id)}
                   onMouseLeave={() => hasChildren && setOpenDropdown(null)}
                 >
                   <Link
                     href={link.href}
+                    target={link.open_new_tab ? '_blank' : undefined}
+                    rel={link.open_new_tab ? 'noopener noreferrer' : undefined}
                     className={cn(
                       'navbar-interactive flex h-full items-center gap-1 px-4 text-sm font-semibold tracking-tight border-b-2 border-transparent transition-[color,border-color] duration-300 ease-out',
                       isActive(link.href)
@@ -310,10 +315,12 @@ export function Header() {
 
                   {hasChildren && isDropdownOpen && (
                     <div className="navbar-dropdown absolute top-full left-0 z-50 w-48 border border-[#d4d4d4] bg-white/95 py-1 shadow-[0_18px_50px_rgba(17,17,17,0.08)] backdrop-blur-sm">
-                      {link.children?.map((child) => (
+                      {link.children.map((child) => (
                         <Link
-                          key={child.href}
+                          key={child.id}
                           href={child.href}
+                          target={child.open_new_tab ? '_blank' : undefined}
+                          rel={child.open_new_tab ? 'noopener noreferrer' : undefined}
                           onClick={() => setOpenDropdown(null)}
                           className={cn(
                             'navbar-interactive block border-l-2 border-transparent px-4 py-2.5 text-sm transition-[background-color,color,border-color] duration-300 ease-out',
@@ -374,12 +381,49 @@ export function Header() {
               )}
             </div>
 
-            <Link
-              href="/auth/login"
-              className="navbar-interactive hidden h-9 items-center gap-1.5 rounded-sm border border-black bg-white px-4 text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white md:flex"
-            >
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <div className="relative hidden md:block" ref={profileRef}>
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black"
+                  aria-label="Profile"
+                >
+                  <User size={18} />
+                </button>
+                {profileOpen && (
+                  <div className="navbar-dropdown absolute right-0 z-50 w-44 border border-[#d4d4d4] bg-white/95 py-1 shadow-[0_18px_50px_rgba(17,17,17,0.08)] backdrop-blur-sm">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setProfileOpen(false)}
+                      className="navbar-interactive flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:text-black hover:bg-[#f7f7f7]"
+                    >
+                      <LayoutDashboard size={15} />
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setProfileOpen(false);
+                        const { signOut } = await import('@/actions/auth.actions');
+                        await signOut();
+                        router.push('/auth/login');
+                      }}
+                      className="navbar-interactive flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:text-red-600 hover:bg-[#f7f7f7]"
+                    >
+                      <LogOut size={15} />
+                      Keluar
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="navbar-interactive hidden h-9 items-center gap-1.5 rounded-sm border border-black bg-white px-4 text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white md:flex"
+              >
+                Login
+              </Link>
+            )}
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -406,12 +450,14 @@ export function Header() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-1">
-              {NAV_LINKS.map((link) => {
-                const hasChildren = link.children && link.children.length > 0;
+              {navigation.map((link) => {
+                const hasChildren = link.children.length > 0;
                 return (
-                  <div key={link.label}>
+                  <div key={link.id}>
                     <Link
                       href={link.href}
+                      target={link.open_new_tab ? '_blank' : undefined}
+                      rel={link.open_new_tab ? 'noopener noreferrer' : undefined}
                       onClick={() => !hasChildren && setMobileOpen(false)}
                       className={cn(
                         'navbar-interactive flex items-center border-l-2 border-transparent px-4 py-3 text-sm font-semibold transition-[background-color,color,border-color] duration-300 ease-out',
@@ -424,10 +470,12 @@ export function Header() {
                     </Link>
                     {hasChildren && (
                       <div className="ml-4 space-y-0.5 mt-0.5">
-                        {link.children?.map((child) => (
+                        {link.children.map((child) => (
                           <Link
-                            key={child.href}
+                            key={child.id}
                             href={child.href}
+                            target={child.open_new_tab ? '_blank' : undefined}
+                            rel={child.open_new_tab ? 'noopener noreferrer' : undefined}
                             onClick={() => setMobileOpen(false)}
                             className={cn(
                               'navbar-interactive flex items-center border-l-2 border-transparent px-4 py-2.5 text-sm transition-[background-color,color,border-color] duration-300 ease-out',
@@ -446,13 +494,39 @@ export function Header() {
               })}
             </div>
             <div className="border-t border-[#d4d4d4] p-4 flex-shrink-0">
-              <Link
-                href="/auth/login"
-                onClick={() => setMobileOpen(false)}
-                className="navbar-interactive mb-3 flex h-10 items-center justify-center border border-black bg-white text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white"
-              >
-                Login
-              </Link>
+              {isLoggedIn ? (
+                <div className="mb-3 space-y-2">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="navbar-interactive flex h-10 items-center justify-center gap-2 border border-black bg-white text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white"
+                  >
+                    <LayoutDashboard size={15} />
+                    Dashboard
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setMobileOpen(false);
+                      const { signOut } = await import('@/actions/auth.actions');
+                      await signOut();
+                      router.push('/auth/login');
+                    }}
+                    className="navbar-interactive flex h-10 w-full items-center justify-center gap-2 border border-red-200 bg-white text-sm font-semibold text-red-600 transition-colors duration-300 ease-out hover:bg-red-50"
+                  >
+                    <LogOut size={15} />
+                    Keluar
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="navbar-interactive mb-3 flex h-10 items-center justify-center border border-black bg-white text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white"
+                >
+                  Login
+                </Link>
+              )}
               <p className="text-xs font-semibold uppercase tracking-wider text-[#999] mb-3">Bahasa</p>
               <div className="space-y-1">
                 {localeKeys.map((locale) => (

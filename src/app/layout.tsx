@@ -2,44 +2,39 @@ import type { Metadata } from "next";
 import { Tajawal } from "next/font/google";
 import { Toaster } from 'sonner';
 import "./globals.css";
-import { siteConfig } from "@/config/site";
-
 const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["latin"],
   weight: ["200", "300", "400", "500", "700", "800", "900"],
 });
 
+const siteName = 'Bison Denim';
+
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.defaultTitle,
-    template: siteConfig.titleTemplate,
+    default: `${siteName} — Fashion Berkualitas`,
+    template: `%s | ${siteName}`,
   },
-  description: siteConfig.description,
+  description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
   icons: {
-    icon: siteConfig.ogImage,
-    shortcut: siteConfig.ogImage,
-    apple: siteConfig.ogImage,
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
   openGraph: {
-    title: siteConfig.defaultTitle,
-    description: siteConfig.description,
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    locale: siteConfig.locale,
+    title: `${siteName} — Fashion Berkualitas`,
+    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+    siteName,
+    locale: 'id',
     type: 'website',
-    images: [
-      {
-        url: siteConfig.ogImage,
-        alt: siteConfig.name,
-      },
-    ],
+    images: [{ url: '/icon.png', alt: siteName }],
   },
   twitter: {
     card: 'summary',
-    title: siteConfig.defaultTitle,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
+    title: `${siteName} — Fashion Berkualitas`,
+    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
+    images: ['/icon.png'],
   },
   robots: {
     index: true,

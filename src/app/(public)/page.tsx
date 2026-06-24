@@ -1,29 +1,37 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { createServerSupabase } from '@/lib/supabase/server';
 import { HeroSlider, type HeroSlide } from '@/components/public/hero-slider';
+import { hasRichTextContent, RichTextRenderer } from '@/lib/rich-text';
+import {
+  FALLBACK_HOMEPAGE_SECTIONS,
+  getPostCategoryLabel,
+  getHeroSlides,
+  getHomepageSections,
+  getPublishedPosts,
+  getPublishedServices,
+} from '@/lib/public-content';
+import type { PageSection } from '@/types';
 
-// Fallback data (used when DB is empty)
 const FALLBACK_HERO_SLIDES: HeroSlide[] = [
   {
     image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1920&q=80',
     alt: 'Display koleksi denim Bison Denim',
-    eyebrow: 'Sejak 1998',
+    eyebrow: 'Bison Denim',
     title: 'BISON DENIM',
-    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas.',
+    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
     cta: { label: 'Lihat Produk', href: '/services' },
   },
   {
     image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Display kemeja premium Bison Denim',
-    eyebrow: 'Premium Quality',
+    alt: 'Model mengenakan kemeja premium Bison Denim',
+    eyebrow: 'Koleksi Favorit',
     title: 'KEMEJA PREMIUM',
-    description: 'Bahan katun pilihan dengan potongan modern dan klasik untuk gaya setiap hari.',
-    cta: { label: 'Jelajahi Kemeja', href: '/services' },
+    description: 'Potongan modern dan bahan nyaman untuk tampilan rapi setiap hari.',
+    cta: { label: 'Lihat Produk', href: '/services/custom-tailoring' },
   },
   {
-    image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Display hoodie edisi terbatas Bison Denim',
+    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Koleksi hoodie dan sweater Bison Denim',
     eyebrow: 'Edisi Terbatas',
     title: 'HOODIE & SWEATER',
     description: 'Nyaman dan kekinian untuk gaya santai sehari-hari musim ini.',
@@ -31,272 +39,201 @@ const FALLBACK_HERO_SLIDES: HeroSlide[] = [
   },
 ];
 
-const FALLBACK_SERVICES = [
-  {
-    title: 'Denim Collection',
-    description: 'Koleksi celana dan jaket denim berkualitas tinggi untuk gaya kasual hingga formal.',
-    image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80',
-    slug: 'denim-collection',
-  },
-  {
-    title: 'Kemeja',
-    description: 'Kemeja pria dan wanita dari bahan premium dengan potongan modern dan klasik.',
-    image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=1200&q=80',
-    slug: 'custom-tailoring',
-  },
-  {
-    title: 'Hoodie & Sweater',
-    description: 'Hoodie dan sweater nyaman dengan desain kekinian untuk gaya santai sehari-hari.',
-    image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1200&q=80',
-    slug: 'wholesale-supply',
-  },
-  {
-    title: 'Aksesori Fashion',
-    description: 'Topi, tas, dan aksesori denim pelengkap gaya Anda.',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80',
-    slug: 'sustainable-fashion',
-  },
-  {
-    title: 'Produk Lainnya',
-    description: 'Berbagai produk fashion berkualitas untuk kebutuhan Anda.',
-    image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=80',
-    slug: 'brand-collaboration',
-  },
-];
-
-const FALLBACK_NEWS = [
-  {
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1200&q=80',
-    category: 'PRODUK',
-    title: 'Koleksi Denim Terbaru Telah Hadir',
-    slug: 'koleksi-denim-terbaru',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1200&q=80',
-    category: 'PRODUK',
-    title: 'Kemeja Premium Bahan Katun Pilihan',
-    slug: 'kemeja-premium-katun',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1200&q=80',
-    category: 'PRODUK',
-    title: 'Hoodie Edisi Terbatas Musim Ini',
-    slug: 'hoodie-edisi-terbatas',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1200&q=80',
-    category: 'KEGIATAN',
-    title: 'Bison Denim di Pameran Fashion 2026',
-    slug: 'bison-denim-pameran-fashion-2026',
-  },
-];
-
-async function getLandingData() {
-  const supabase = await createServerSupabase();
-
-  // Fetch hero slides
-  const { data: heroData } = await supabase
-    .from('homepage_sections')
-    .select('settings, is_visible')
-    .eq('section_key', 'hero_slider')
-    .eq('is_visible', true)
-    .order('sort_order', { ascending: true });
-
-  const heroSlides: HeroSlide[] = (heroData ?? []).map((item) => {
-    const s = item.settings as Record<string, string>;
-    return {
-      image: s.image || '',
-      alt: s.alt || s.title || '',
-      eyebrow: s.eyebrow || undefined,
-      title: s.title || '',
-      description: s.description || '',
-      cta: s.cta_label ? { label: s.cta_label, href: s.cta_href || '/services' } : undefined,
-    };
-  });
-
-  // Fetch published services
-  const { data: servicesData } = await supabase
-    .from('services')
-    .select('title, slug, excerpt, cover_image_url')
-    .eq('status', 'published')
-    .order('sort_order', { ascending: true })
-    .limit(5);
-
-  const services = (servicesData ?? []).map((s) => ({
-    title: s.title,
-    description: s.excerpt || '',
-    image: s.cover_image_url || '',
-    slug: s.slug,
-  }));
-
-  // Fetch published posts
-  const { data: postsData } = await supabase
-    .from('posts')
-    .select('title, slug, excerpt, cover_image_url')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-    .limit(4);
-
-  const news = (postsData ?? []).map((p) => ({
-    title: p.title,
-    description: p.excerpt || '',
-    image: p.cover_image_url || '',
-    slug: p.slug,
-    category: 'BERITA',
-  }));
-
-  return {
-    heroSlides: heroSlides.length > 0 ? heroSlides : FALLBACK_HERO_SLIDES,
-    services: services.length > 0 ? services : FALLBACK_SERVICES,
-    news: news.length > 0 ? news : FALLBACK_NEWS,
-  };
+function getSectionContent(section: PageSection) {
+  return (section.content ?? {}) as Record<string, unknown>;
 }
 
-export default async function HomePage() {
-  const { heroSlides, services, news } = await getLandingData();
+function getText(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : fallback;
+}
 
-  return (
-    <>
-      <HeroSlider slides={heroSlides} />
+function getNumber(value: unknown, fallback: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
 
-      <section className="py-24 px-6">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+function renderSection(
+  section: PageSection,
+  context: {
+    services: Awaited<ReturnType<typeof getPublishedServices>>;
+    posts: Awaited<ReturnType<typeof getPublishedPosts>>;
+  }
+) {
+  const content = getSectionContent(section);
+
+  switch (section.section_type) {
+    case 'intro':
+      return (
+        <section key={section.id} className="px-6 py-24">
+          <div className="mx-auto grid max-w-7xl items-center gap-16 md:grid-cols-2">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-black leading-tight mb-6">
-                Tentang Kami
+              <h2 className="mb-6 text-3xl font-bold leading-tight text-black sm:text-4xl">
+                {getText(content.title, 'Tentang Kami')}
               </h2>
-              <p className="text-[#555] text-base leading-relaxed mb-5">
-                Bison Denim adalah perusahaan fashion Indonesia yang bergerak di bidang penjualan
-                pakaian denim, kemeja, hoodie, dan berbagai produk fashion lainnya. Berdiri
-                sejak 1998 di Bandung, kami berkomitmen menghadirkan produk berkualitas dengan
-                harga terjangkau untuk semua kalangan.
-              </p>
-              <p className="text-[#555] text-base leading-relaxed mb-5">
-                Dengan jaringan distribusi yang luas dan pengalaman lebih dari dua dekade,
-                Bison Denim telah menjadi pilihan utama bagi konsumen yang mencari produk
-                fashion denim dan non-denim yang terpercaya di Indonesia.
-              </p>
-              <Link
-                href="/about/company-information"
-                className="inline-flex items-center gap-2 text-black font-bold text-sm hover:opacity-60 transition-colors duration-200"
-              >
-                Pelajari Selengkapnya &rarr;
-              </Link>
+              <RichTextRenderer
+                content={hasRichTextContent(content.body) ? content.body : ''}
+                className="text-base leading-relaxed text-[#555]"
+              />
+              {getText(content.link_label) && getText(content.link_href) && (
+                <Link
+                  href={getText(content.link_href)}
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-black transition-colors duration-200 hover:opacity-60"
+                >
+                  {getText(content.link_label)} &rarr;
+                </Link>
+              )}
             </div>
             <div>
-              <div className="relative aspect-[4/3] border border-[#d4d4d4]">
-                <Image
-                  src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
-                  alt="Display produk Bison Denim"
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative aspect-[4/3] border border-[#d4d4d4] bg-[#f5f5f5]">
+                {getText(content.image) ? (
+                  <Image
+                    src={getText(content.image)}
+                    alt={getText(content.title, 'Section image')}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-[#777]">
+                    Tambahkan gambar section dari page builder
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      );
+    case 'services': {
+      const limit = getNumber(content.limit, 5);
+      const services = context.services.slice(0, limit);
 
-      <section className="py-24 px-6 bg-[#f5f5f5]">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-black">
-              Produk Kami
-            </h2>
-            <p className="text-[#555] text-base mt-3 max-w-xl leading-relaxed">
-              Berbagai pilihan produk fashion untuk memenuhi kebutuhan Anda.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-            {services.map((item) => (
-              <Link
-                key={item.slug}
-                href={`/services/${item.slug}`}
-                className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
-              >
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  <h3 className="text-sm font-bold text-black mb-1.5">{item.title}</h3>
-                  <p className="text-[#555] text-xs leading-relaxed">{item.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 px-6 bg-[#f5f5f5] border-t border-[#d4d4d4]">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-black">
-                Berita Terbaru
+      return (
+        <section key={section.id} className="bg-[#f5f5f5] px-6 py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14">
+              <h2 className="text-3xl font-bold text-black sm:text-4xl">
+                {getText(content.title, 'Produk Kami')}
               </h2>
-              <p className="text-[#555] text-base mt-3 leading-relaxed">
-                Informasi terbaru seputar produk dan kegiatan Bison Denim.
-              </p>
+              <RichTextRenderer
+                content={hasRichTextContent(content.description) ? content.description : ''}
+                className="mt-3 max-w-xl text-base leading-relaxed text-[#555]"
+              />
             </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {services.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/services/${item.slug}`}
+                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+                >
+                  <div className="relative aspect-[4/3] bg-[#f5f5f5]">
+                    {item.cover_image_url ? (
+                      <Image src={item.cover_image_url} alt={item.title} fill className="object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-[#777]">No image</div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <h3 className="mb-1.5 text-sm font-bold text-black">{item.title}</h3>
+                    <p className="text-xs leading-relaxed text-[#555]">{item.excerpt ?? ''}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+    case 'news': {
+      const limit = getNumber(content.limit, 4);
+      const posts = context.posts.slice(0, limit);
+
+      return (
+        <section key={section.id} className="border-t border-[#d4d4d4] bg-[#f5f5f5] px-6 py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 flex items-end justify-between gap-6">
+              <div>
+                <h2 className="text-3xl font-bold text-black sm:text-4xl">
+                  {getText(content.title, 'Berita Terbaru')}
+                </h2>
+                <RichTextRenderer
+                  content={hasRichTextContent(content.description) ? content.description : ''}
+                  className="mt-3 text-base leading-relaxed text-[#555]"
+                />
+              </div>
+              <Link href="/news" className="text-sm font-bold text-black transition-colors duration-200 hover:opacity-60">
+                Lihat Semua &rarr;
+              </Link>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {posts.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/news/${item.slug}`}
+                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+                >
+                  <div className="relative aspect-[4/3] bg-[#f5f5f5]">
+                    {item.cover_image_url ? (
+                      <Image src={item.cover_image_url} alt={item.title} fill className="object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-[#777]">No image</div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#555]">
+                      {getPostCategoryLabel(item)}
+                    </span>
+                    <h3 className="mt-1 text-sm font-bold leading-snug text-black">{item.title}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+    case 'cta':
+      return (
+        <section key={section.id} className="bg-black px-6 py-24">
+          <div className="mx-auto max-w-7xl text-center">
+            <h2 className="mb-4 text-3xl font-bold text-white">
+              {getText(content.title, 'Hubungi Kami')}
+            </h2>
+            <RichTextRenderer
+              content={hasRichTextContent(content.description) ? content.description : ''}
+              className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/70 [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white"
+            />
             <Link
-              href="/news"
-              className="text-black font-bold text-sm hover:opacity-60 transition-colors duration-200"
+              href={getText(content.button_href, '/contact-us')}
+              className="inline-flex items-center gap-2 bg-white px-6 py-3 text-sm font-bold text-black transition-colors duration-200 hover:bg-gray-100"
             >
-              Lihat Semua &rarr;
+              {getText(content.button_label, 'Hubungi Kami')} &rarr;
             </Link>
           </div>
+        </section>
+      );
+    default:
+      return null;
+  }
+}
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {news.map((item) => (
-              <Link
-                key={item.slug}
-                href={`/news/${item.slug}`}
-                className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
-              >
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  <span className="text-[11px] font-bold text-[#555] uppercase tracking-wider">
-                    {item.category}
-                  </span>
-                  <h3 className="text-black font-bold text-sm leading-snug mt-1">
-                    {item.title}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+export default async function HomePage() {
+  const [heroSlides, homepage, services, posts] = await Promise.all([
+    getHeroSlides(),
+    getHomepageSections(),
+    getPublishedServices(10),
+    getPublishedPosts(10),
+  ]);
 
-      <section className="py-24 px-6 bg-black">
-        <div className="mx-auto max-w-7xl text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Hubungi Kami
-          </h2>
-          <p className="text-white/70 text-base max-w-xl mx-auto leading-relaxed mb-8">
-            Tertarik dengan produk kami? Hubungi tim Bison Denim untuk informasi lebih lanjut.
-          </p>
-          <Link
-            href="/contact-us"
-            className="inline-flex items-center gap-2 bg-white text-black font-bold text-sm px-6 py-3 hover:bg-gray-100 transition-colors duration-200"
-          >
-            Hubungi Kami &rarr;
-          </Link>
-        </div>
-      </section>
+  const sections = homepage.sections.length > 0 ? homepage.sections : FALLBACK_HOMEPAGE_SECTIONS;
+
+  const renderedSections = sections
+    .map((section) => renderSection(section, { services, posts }))
+    .filter(Boolean);
+
+  return (
+    <>
+      <HeroSlider slides={heroSlides.length > 0 ? heroSlides : FALLBACK_HERO_SLIDES} />
+
+      {renderedSections}
     </>
   );
 }

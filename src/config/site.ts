@@ -1,11 +1,11 @@
 export const siteConfig = {
-  name: 'Bison Denim',
-  description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas.',
+  name: process.env.NEXT_PUBLIC_SITE_NAME || 'Bison Denim',
+  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas.',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
-  ogImage: '/icon.png',
+  ogImage: process.env.NEXT_PUBLIC_SITE_OG_IMAGE || '/icon.png',
   locale: 'id',
-  defaultTitle: 'Bison Denim — Fashion Berkualitas',
-  titleTemplate: '%s | Bison Denim',
+  defaultTitle: process.env.NEXT_PUBLIC_SITE_DEFAULT_TITLE || 'Bison Denim — Fashion Berkualitas',
+  titleTemplate: `%s | ${process.env.NEXT_PUBLIC_SITE_NAME || 'Bison Denim'}`,
   links: {},
 };
 

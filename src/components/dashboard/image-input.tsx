@@ -19,6 +19,10 @@ interface ImageInputProps {
   aspectClass?: string;
   /** Help text shown under the field. */
   hint?: string;
+  /** Optional callback fired whenever the resolved value changes. */
+  onChange?: (value: string) => void;
+  /** Optional wrapper width class for compact layouts. */
+  wrapperClassName?: string;
 }
 
 type Mode = 'file' | 'link';
@@ -30,6 +34,8 @@ export function ImageInput({
   required = false,
   aspectClass = 'aspect-[4/3]',
   hint,
+  onChange,
+  wrapperClassName,
 }: ImageInputProps) {
   const [value, setValue] = useState(defaultValue);
   const [mode, setMode] = useState<Mode>('file');
@@ -37,9 +43,17 @@ export function ImageInput({
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Centralized setter that also notifies parent
+  function update(next: string) {
+    setValue(next);
+    onChange?.(next);
+  }
+
   // Keep hidden field synced
   useEffect(() => {
-    setValue(defaultValue);
+    queueMicrotask(() => {
+      setValue(defaultValue);
+    });
   }, [defaultValue]);
 
   async function handleFile(file: File) {
@@ -55,7 +69,7 @@ export function ImageInput({
       return;
     }
     if (result.url) {
-      setValue(result.url);
+      update(result.url);
       toast.success('Gambar diunggah');
     }
   }
@@ -68,7 +82,7 @@ export function ImageInput({
   }
 
   return (
-    <div>
+    <div className={wrapperClassName}>
       {label && (
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
@@ -111,6 +125,12 @@ export function ImageInput({
         className={`relative ${aspectClass} w-full overflow-hidden rounded-sm border border-gray-200 bg-gray-50 ${
           dragOver ? 'ring-2 ring-gray-900' : ''
         }`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
       >
         {value ? (
           <>
@@ -123,7 +143,7 @@ export function ImageInput({
             />
             <button
               type="button"
-              onClick={() => setValue('')}
+              onClick={() => update('')}
               className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm hover:bg-white hover:text-red-600 transition-colors"
               title="Hapus gambar"
             >
@@ -183,7 +203,7 @@ export function ImageInput({
         <input
           type="url"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => update(e.target.value)}
           placeholder="https://images.unsplash.com/..."
           className="mt-2 w-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
         />

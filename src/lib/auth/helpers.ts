@@ -1,5 +1,7 @@
 import { createServerSupabase } from '@/lib/supabase/server';
-import type { UserRole, Profile } from '@/types';
+import { redirect } from 'next/navigation';
+import type { DashboardModuleKey, UserRole, Profile } from '@/types';
+import { hasDashboardModuleAccess, hasMinimumRole } from '@/lib/permissions';
 
 export async function getCurrentUser() {
   const supabase = await createServerSupabase();
@@ -23,14 +25,15 @@ export async function getCurrentProfile(): Promise<Profile | null> {
 
 export async function checkPermission(requiredRole: UserRole): Promise<boolean> {
   const profile = await getCurrentProfile();
-  if (!profile || !profile.is_active) return false;
+  return hasMinimumRole(profile, requiredRole);
+}
 
-  const hierarchy: Record<UserRole, number> = {
-    super_admin: 4,
-    admin: 3,
-    editor: 2,
-    viewer: 1,
-  };
+export async function requireDashboardModuleAccess(moduleKey: DashboardModuleKey): Promise<Profile> {
+  const profile = await getCurrentProfile();
 
-  return hierarchy[profile.role] >= hierarchy[requiredRole];
+  if (!hasDashboardModuleAccess(profile, moduleKey)) {
+    redirect('/dashboard');
+  }
+
+  return profile!;
 }

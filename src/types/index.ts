@@ -2,6 +2,42 @@ export type ContentStatus = 'draft' | 'published' | 'archived';
 export type UserRole = 'super_admin' | 'admin' | 'editor' | 'viewer';
 export type LeadStatus = 'new' | 'contacted' | 'resolved' | 'spam';
 export type NavLocation = 'header' | 'footer' | 'mobile';
+export type DashboardRole = UserRole;
+export type DashboardModuleKey =
+  | 'overview'
+  | 'hero'
+  | 'pages'
+  | 'services'
+  | 'posts'
+  | 'navigation'
+  | 'media'
+  | 'users'
+  | 'settings'
+  | 'audit_logs';
+export type DashboardModuleAction = 'create' | 'edit' | 'publish' | 'delete' | 'manage' | 'view';
+
+export interface DashboardPermissionSet {
+  modules: Record<DashboardModuleKey, boolean>;
+  module_actions: Record<DashboardModuleKey, Partial<Record<DashboardModuleAction, boolean>>>;
+}
+
+export interface RichTextMark {
+  type: string;
+  attrs?: Record<string, unknown>;
+}
+
+export interface RichTextNode {
+  type: string;
+  attrs?: Record<string, unknown>;
+  text?: string;
+  marks?: RichTextMark[];
+  content?: RichTextNode[];
+}
+
+export interface RichTextDocument {
+  type: 'doc';
+  content: RichTextNode[];
+}
 
 export type SectionType =
   | 'hero'
@@ -24,12 +60,14 @@ export interface Profile {
   avatar_url: string | null;
   role: UserRole;
   is_active: boolean;
+  dashboard_permissions?: DashboardPermissionSet | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface Page {
   id: string;
+  page_key?: string | null;
   title: string;
   slug: string;
   description: string | null;
@@ -86,7 +124,7 @@ export interface Project {
   excerpt: string | null;
   content: Record<string, unknown> | null;
   cover_image_url: string | null;
-  gallery: Record<string, unknown> | null;
+  gallery: unknown[] | Record<string, unknown> | null;
   is_featured: boolean;
   status: ContentStatus;
   published_at: string | null;
@@ -106,6 +144,7 @@ export interface Post {
   status: ContentStatus;
   seo_title: string | null;
   seo_description: string | null;
+  is_featured?: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -151,6 +190,10 @@ export interface ContactSubmission {
   email: string;
   phone: string | null;
   company: string | null;
+  company_name?: string | null;
+  company_name_old?: string | null;
+  country?: string | null;
+  locale?: string | null;
   subject: string | null;
   message: string;
   status: LeadStatus;
@@ -176,6 +219,8 @@ export interface AuditLog {
   entity_type: string;
   entity_id: string | null;
   metadata: Record<string, unknown> | null;
+  before_json?: Record<string, unknown> | null;
+  after_json?: Record<string, unknown> | null;
   ip_address: string | null;
   created_at: string;
 }
@@ -187,4 +232,20 @@ export interface Category {
   type: 'service' | 'project' | 'post';
   created_at: string;
   updated_at: string;
+}
+
+export interface GroupedSiteSettings {
+  brand: {
+    site_name: string;
+    logo: string;
+  };
+  company: {
+    site_description: string;
+    footer_description: string;
+  };
+  contact: {
+    contact_email: string;
+    contact_phone: string;
+    contact_address: string;
+  };
 }

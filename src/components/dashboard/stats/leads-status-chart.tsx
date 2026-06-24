@@ -18,16 +18,16 @@ export function LeadsStatusChart({ data }: LeadsStatusChartProps) {
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
           <XAxis
             dataKey="label"
-            stroke="#666"
+            stroke="#9ca3af"
             fontSize={11}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke="#666"
+            stroke="#9ca3af"
             fontSize={11}
             tickLine={false}
             axisLine={false}
@@ -35,13 +35,14 @@ export function LeadsStatusChart({ data }: LeadsStatusChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#141414',
-              border: '1px solid #2a2a2a',
-              borderRadius: '2px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '4px',
               fontSize: '12px',
-              color: '#f5f5f5',
+              color: '#111111',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
-            cursor={{ fill: '#1c1c1c' }}
+            cursor={{ fill: '#f3f4f6' }}
           />
           <Bar dataKey="count" radius={[2, 2, 0, 0]} name="Leads">
             {data.map((entry, index) => (
