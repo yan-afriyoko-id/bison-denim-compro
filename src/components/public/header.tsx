@@ -49,19 +49,25 @@ declare global {
 }
 
 const localeKeys = Object.keys(localeOptions) as LocaleKey[];
+const DEFAULT_LOCALE: LocaleKey = 'en';
 
-function getSavedLocale(): LocaleKey {
+function getGoogleTranslateCookieValue() {
   if (typeof document === 'undefined') {
-    return 'id';
+    return null;
   }
 
-  const cookieValue = document.cookie
+  return (
+    document.cookie
     .split('; ')
     .find((row) => row.startsWith(`${GOOGLE_TRANSLATE_COOKIE}=`))
     ?.split('=')
     .slice(1)
-    .join('=');
+    .join('=') ?? null
+  );
+}
 
+function getSavedLocale(): LocaleKey {
+  const cookieValue = getGoogleTranslateCookieValue();
   if (!cookieValue) {
     return 'id';
   }
@@ -73,13 +79,17 @@ function getSavedLocale(): LocaleKey {
 
 function getPreferredLocale(): LocaleKey {
   if (typeof window === 'undefined') {
-    return 'id';
+    return DEFAULT_LOCALE;
   }
 
   const storedLocale = window.localStorage.getItem(PREFERRED_LOCALE_KEY);
 
   if (storedLocale && localeKeys.includes(storedLocale as LocaleKey)) {
     return storedLocale as LocaleKey;
+  }
+
+  if (!getGoogleTranslateCookieValue()) {
+    return DEFAULT_LOCALE;
   }
 
   return getSavedLocale();
@@ -102,6 +112,10 @@ function triggerGoogleTranslate(languageCode: string) {
 
   if (!select) {
     return false;
+  }
+
+  if (select.value === languageCode) {
+    return true;
   }
 
   select.value = languageCode;
@@ -136,12 +150,6 @@ function syncGoogleTranslateState(locale: LocaleKey) {
   }
 
   const targetLanguage = localeOptions[locale].googleCode;
-  const currentLocale = getSavedLocale();
-
-  if (currentLocale === locale) {
-    return;
-  }
-
   setGoogleTranslateCookie(`/${SOURCE_LANGUAGE}/${targetLanguage}`);
   triggerGoogleTranslate(targetLanguage);
 }
@@ -165,7 +173,7 @@ export function Header({
   const [searchOpen, setSearchOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [activeLocale, setActiveLocale] = useState<LocaleKey>('id');
+  const [activeLocale, setActiveLocale] = useState<LocaleKey>(DEFAULT_LOCALE);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
@@ -198,7 +206,9 @@ export function Header({
 
   useEffect(() => {
     queueMicrotask(() => {
-      setActiveLocale(getPreferredLocale());
+      const preferredLocale = getPreferredLocale();
+      persistPreferredLocale(preferredLocale);
+      setActiveLocale(preferredLocale);
     });
   }, []);
 
@@ -257,6 +267,37 @@ export function Header({
 
   return (
     <>
+      <Script
+        id="google-translate-default-locale"
+        strategy="beforeInteractive"
+      >{`
+        (function () {
+          var preferredKey = '${PREFERRED_LOCALE_KEY}';
+          var cookieName = '${GOOGLE_TRANSLATE_COOKIE}';
+          var defaultLocale = '${DEFAULT_LOCALE}';
+          var defaultCookie = '/${SOURCE_LANGUAGE}/${localeOptions.en.googleCode}';
+          var hasPreferredLocale = false;
+          var hasTranslateCookie = false;
+
+          try {
+            hasPreferredLocale = !!window.localStorage.getItem(preferredKey);
+          } catch (error) {}
+
+          hasTranslateCookie = document.cookie.split('; ').some(function (row) {
+            return row.indexOf(cookieName + '=') === 0;
+          });
+
+          if (!hasPreferredLocale) {
+            try {
+              window.localStorage.setItem(preferredKey, defaultLocale);
+            } catch (error) {}
+          }
+
+          if (!hasTranslateCookie) {
+            document.cookie = cookieName + '=' + encodeURIComponent(defaultCookie) + '; path=/; max-age=31536000';
+          }
+        })();
+      `}</Script>
       <Script
         id="google-translate-script"
         src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
