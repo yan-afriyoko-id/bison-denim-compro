@@ -40,13 +40,9 @@ import {
   type HeroSlideData,
 } from '@/actions/homepage.actions';
 import { ImageInput } from '@/components/dashboard/image-input';
+import type { HeroSlideRecord } from '@/lib/homepage';
 
-interface Slide extends HeroSlideData {
-  id: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-}
+interface Slide extends HeroSlideRecord, HeroSlideData {}
 
 interface EditingState {
   mode: 'create' | 'edit';

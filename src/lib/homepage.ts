@@ -7,7 +7,6 @@ export interface HeroSlideRecord extends HeroSlideData {
   id: string;
   sort_order: number;
   is_visible: boolean;
-  created_at: string;
 }
 
 export async function fetchHeroSlides() {
@@ -15,7 +14,7 @@ export async function fetchHeroSlides() {
 
   const { data, error } = await supabase
     .from('homepage_sections')
-    .select('id, settings, sort_order, is_visible, created_at')
+    .select('id, settings, sort_order, is_visible')
     .eq('section_key', HERO_SECTION_KEY)
     .order('sort_order', { ascending: true });
 

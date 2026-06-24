@@ -963,7 +963,8 @@ export async function getPublishedServiceBySlug(slug: string) {
     .eq('status', 'published')
     .maybeSingle();
 
-  return ((data ?? null) as Service | null) ?? FALLBACK_SERVICES.find((service) => service.slug === slug) ?? null;
+  const service = data as Service | null;
+  return service ?? FALLBACK_SERVICES.find((item) => item.slug === slug) ?? null;
 }
 
 export async function getPublishedPosts(limit?: number) {
@@ -995,7 +996,8 @@ export async function getPublishedPostBySlug(slug: string) {
     .eq('status', 'published')
     .maybeSingle();
 
-  return ((data ?? null) as Post | null) ?? FALLBACK_POSTS.find((post) => post.slug === slug) ?? null;
+  const post = data as Post | null;
+  return post ?? FALLBACK_POSTS.find((item) => item.slug === slug) ?? null;
 }
 
 export function getSettingTextValue(value: unknown) {
