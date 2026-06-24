@@ -12,7 +12,7 @@ import {
   Activity,
 } from 'lucide-react';
 
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function getMonthKey(date: string) {
   const d = new Date(date);
@@ -125,13 +125,13 @@ const statCards = [
 function timeAgo(date: string) {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Baru saja';
-  if (mins < 60) return `${mins} menit lalu`;
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} jam lalu`;
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} hari lalu`;
-  return new Date(date).toLocaleDateString('id-ID');
+  if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+  return new Date(date).toLocaleDateString('en-US');
 }
 
 export default async function DashboardPage() {
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
-        <p className="text-sm text-gray-400 mt-1">Ringkasan konten dan aktivitas website</p>
+        <p className="text-sm text-gray-400 mt-1">A quick summary of website content and recent activity.</p>
       </div>
 
       {/* Stat cards */}
@@ -168,8 +168,8 @@ export default async function DashboardPage() {
         <div className="lg:col-span-2 border border-gray-200 bg-white rounded-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-bold text-gray-900">Pertumbuhan Konten</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Pages &amp; posts 6 bulan terakhir</p>
+              <h2 className="text-sm font-bold text-gray-900">Content Growth</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Pages and posts from the last 6 months.</p>
             </div>
             <div className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1.5 text-gray-500">
@@ -184,8 +184,8 @@ export default async function DashboardPage() {
         </div>
 
         <div className="border border-gray-200 bg-white rounded-sm p-5">
-          <h2 className="text-sm font-bold text-gray-900 mb-1">Distribusi Status</h2>
-          <p className="text-xs text-gray-400 mb-4">Semua jenis konten</p>
+          <h2 className="text-sm font-bold text-gray-900 mb-1">Status Distribution</h2>
+          <p className="text-xs text-gray-400 mb-4">Across all content types.</p>
           <StatusDistributionChart data={statusData} />
           <div className="mt-4 space-y-2">
             {statusData.map((item) => (
@@ -207,10 +207,10 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               <Activity className="h-4 w-4 text-gray-500" />
-              Aktivitas Terbaru
+              Recent Activity
             </h2>
             <Link href="/dashboard/audit-logs" className="text-xs text-gray-400 hover:text-gray-900 transition-colors">
-              Lihat semua
+              View all
             </Link>
           </div>
           {recentActivity.length > 0 ? (
@@ -234,7 +234,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-gray-400">Belum ada aktivitas</p>
+              <p className="text-sm text-gray-400">No recent activity yet</p>
             </div>
           )}
         </div>
@@ -242,13 +242,13 @@ export default async function DashboardPage() {
 
       {/* Quick actions */}
       <div>
-        <h2 className="text-sm font-bold text-gray-900 mb-3">Aksi Cepat</h2>
+        <h2 className="text-sm font-bold text-gray-900 mb-3">Quick Actions</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { href: '/dashboard/hero', label: 'Edit Hero Slider', desc: 'Kelola banner utama' },
-            { href: '/dashboard/pages', label: 'Kelola Pages', desc: 'Buat & edit halaman' },
-            { href: '/dashboard/services', label: 'Tambah Service', desc: 'Kelola produk' },
-            { href: '/dashboard/posts', label: 'Tulis Post', desc: 'Buat artikel baru' },
+            { href: '/dashboard/hero', label: 'Edit Hero Slider', desc: 'Manage the homepage banner slides.' },
+            { href: '/dashboard/pages', label: 'Manage Pages', desc: 'Create and edit public pages.' },
+            { href: '/dashboard/services', label: 'Manage Services', desc: 'Update products and service entries.' },
+            { href: '/dashboard/posts', label: 'Write Post', desc: 'Create a new article or news post.' },
           ].map((action) => (
             <Link
               key={action.href}

@@ -12,10 +12,10 @@ export function DashboardTopbar({
 }) {
   const greeting = (() => {
     const h = new Date().getHours();
-    if (h < 11) return 'Selamat pagi';
-    if (h < 15) return 'Selamat siang';
-    if (h < 19) return 'Selamat sore';
-    return 'Selamat malam';
+    if (h < 11) return 'Good morning';
+    if (h < 15) return 'Good afternoon';
+    if (h < 19) return 'Good evening';
+    return 'Good evening';
   })();
 
   return (
@@ -34,7 +34,7 @@ export function DashboardTopbar({
           className="flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors duration-200"
         >
           <ExternalLink className="h-3.5 w-3.5" />
-          Lihat Situs
+          View Site
         </Link>
         <form action={signOut}>
           <button
@@ -42,7 +42,7 @@ export function DashboardTopbar({
             className="flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-red-500 hover:text-red-600 transition-colors duration-200"
           >
             <LogOut className="h-3.5 w-3.5" />
-            Keluar
+            Sign Out
           </button>
         </form>
       </div>

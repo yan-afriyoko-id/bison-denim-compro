@@ -108,7 +108,7 @@ export function PaginationControls(props: PaginationControlsProps) {
   return (
     <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-        <span>{props.totalItems} total item</span>
+        <span>{props.totalItems} total {props.totalItems === 1 ? 'item' : 'items'}</span>
         <label className="flex items-center gap-2">
           <select
             value={props.perPage}
@@ -122,9 +122,7 @@ export function PaginationControls(props: PaginationControlsProps) {
             ))}
           </select>
         </label>
-        <span>
-          Halaman {props.page} dari {props.totalPages}
-        </span>
+        <span>Page {props.page} of {props.totalPages}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

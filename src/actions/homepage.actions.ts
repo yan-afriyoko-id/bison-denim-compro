@@ -7,6 +7,7 @@ import { heroSlideSchema } from '@/lib/validations/content';
 import { createAuditLog } from '@/lib/audit';
 import { friendlyDbError } from '@/lib/cms';
 import { hasDashboardModuleActionAccess } from '@/lib/permissions';
+import { fetchHeroSlides } from '@/lib/homepage';
 
 export interface HeroSlideData {
   eyebrow?: string;
@@ -21,27 +22,7 @@ export interface HeroSlideData {
 const HERO_SECTION_KEY = 'hero_slider';
 
 export async function getHeroSlides() {
-  const supabase = await createServerSupabase();
-
-  const { data, error } = await supabase
-    .from('homepage_sections')
-    .select('id, settings, sort_order, is_visible, created_at')
-    .eq('section_key', HERO_SECTION_KEY)
-    .order('sort_order', { ascending: true });
-
-  if (error) {
-    return { slides: [], error: error.message };
-  }
-
-  const slides = (data ?? []).map((item) => ({
-    id: item.id,
-    sort_order: item.sort_order,
-    is_visible: item.is_visible,
-    created_at: item.created_at,
-    ...(item.settings as HeroSlideData),
-  }));
-
-  return { slides, error: null };
+  return fetchHeroSlides();
 }
 
 export async function createHeroSlide(formData: FormData) {

@@ -58,7 +58,7 @@ export function ImageInput({
 
   async function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
-      toast.error('File harus berupa gambar');
+      toast.error('File must be an image');
       return;
     }
     setUploading(true);
@@ -70,7 +70,7 @@ export function ImageInput({
     }
     if (result.url) {
       update(result.url);
-      toast.success('Gambar diunggah');
+      toast.success('Image uploaded successfully');
     }
   }
 
@@ -145,7 +145,7 @@ export function ImageInput({
               type="button"
               onClick={() => update('')}
               className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm hover:bg-white hover:text-red-600 transition-colors"
-              title="Hapus gambar"
+              title="Remove image"
             >
               <X className="h-4 w-4" />
             </button>
@@ -178,12 +178,12 @@ export function ImageInput({
             {uploading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Mengunggah...
+                Uploading...
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4" />
-                {value ? 'Ganti gambar' : 'Klik atau drag file ke sini'}
+                {value ? 'Replace image' : 'Click or drag a file here'}
               </>
             )}
           </button>

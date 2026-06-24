@@ -69,18 +69,18 @@ export default async function PagesPage({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Pages</h1>
-            <p className="mt-1 text-sm text-gray-400">Kelola halaman landing page</p>
+            <p className="mt-1 text-sm text-gray-400">Manage static pages for the public website.</p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-end">
             <ToolbarFilters
               searchValue={search}
-              searchPlaceholder="Cari judul atau slug"
+              searchPlaceholder="Search title or slug"
               filters={[
                 {
                   name: 'status',
                   value: selectedStatus,
                   options: [
-                    { label: 'Semua status', value: '' },
+                    { label: 'All statuses', value: '' },
                     { label: 'Draft', value: 'draft' },
                     { label: 'Published', value: 'published' },
                     { label: 'Archived', value: 'archived' },
@@ -93,7 +93,7 @@ export default async function PagesPage({
               className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
             >
               <Plus className="h-4 w-4" />
-              Halaman Baru
+              New Page
             </Link>
           </div>
         </div>
@@ -102,8 +102,8 @@ export default async function PagesPage({
       {pages.items.length === 0 ? (
         <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
           <FileText className="h-10 w-10 text-gray-300 mb-4" />
-          <p className="text-sm text-gray-500">Belum ada halaman</p>
-          <p className="text-xs text-gray-400 mt-1">Buat halaman pertama Anda</p>
+          <p className="text-sm text-gray-500">No pages yet</p>
+          <p className="text-xs text-gray-400 mt-1">Create your first page to get started.</p>
         </div>
       ) : (
         <div className="rounded-sm border border-gray-200 bg-white">
@@ -143,7 +143,7 @@ function PageRow({ page }: { page: Awaited<ReturnType<typeof getPages>>['items']
           </span>
         </div>
         <p className="text-xs text-gray-400 mt-1">{publicLabel}</p>
-        <p className="text-[11px] text-gray-400 mt-1">Diupdate {formatDate(page.updated_at, 'dd MMM yyyy HH:mm')}</p>
+        <p className="text-[11px] text-gray-400 mt-1">Updated {formatDate(page.updated_at, 'dd MMM yyyy HH:mm')}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0 ml-4">
         <Link
@@ -169,7 +169,7 @@ function PageRow({ page }: { page: Awaited<ReturnType<typeof getPages>>['items']
             <Send className="h-4 w-4" />
           </ActionButton>
         ) : (
-          <Link href={publicHref} target="_blank" className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors" title="Lihat halaman">
+          <Link href={publicHref} target="_blank" className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors" title="View page">
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         )}

@@ -183,7 +183,7 @@ export function UsersManager({
       };
 
       setUsers((prev) => [nextUser, ...prev]);
-      toast.success('User berhasil dibuat');
+      toast.success('User created successfully');
       resetEditor();
       return;
     }
@@ -225,12 +225,12 @@ export function UsersManager({
     );
     setUsers(nextUsers);
     setActiveUser(nextUsers.find((user) => user.id === activeUser.id) ?? null);
-    toast.success('Pengguna berhasil diperbarui');
+    toast.success('User updated successfully');
     resetEditor();
   }
 
   async function handleDelete(user: Profile) {
-    if (!confirm(`Hapus user "${user.full_name ?? user.id}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (!confirm(`Delete user "${user.full_name ?? user.id}"? This action cannot be undone.`)) return;
 
     const result = await deleteUser(user.id);
     if (result.error) {
@@ -248,7 +248,7 @@ export function UsersManager({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Users</h1>
-            <p className="mt-1 text-sm text-gray-400">Manajemen pengguna, role, dan akses dashboard.</p>
+            <p className="mt-1 text-sm text-gray-400">Manage users, roles, and dashboard access.</p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-end">
             <label className="relative md:min-w-[260px]">
@@ -259,7 +259,7 @@ export function UsersManager({
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Cari nama atau user id"
+                placeholder="Search name or user id"
                 className="w-full rounded-sm border border-gray-200 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-900"
               />
             </label>
@@ -271,7 +271,7 @@ export function UsersManager({
               }}
               className="rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 md:min-w-[160px]"
             >
-              <option value="">Semua role</option>
+              <option value="">All roles</option>
               <option value="super_admin">Super Admin</option>
               <option value="admin">Admin</option>
               <option value="editor">Editor</option>
@@ -285,7 +285,7 @@ export function UsersManager({
               }}
               className="rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 md:min-w-[160px]"
             >
-              <option value="">Semua status</option>
+              <option value="">All statuses</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
@@ -296,7 +296,7 @@ export function UsersManager({
                 className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
               >
                 <UserPlus className="h-4 w-4" />
-                Tambah User
+                Add User
               </button>
             )}
           </div>
@@ -306,7 +306,7 @@ export function UsersManager({
       {filteredUsers.length === 0 ? (
         <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
           <Users className="h-10 w-10 text-gray-300 mb-4" />
-          <p className="text-sm text-gray-500">Belum ada pengguna</p>
+          <p className="text-sm text-gray-500">No users yet</p>
         </div>
       ) : (
         <div className="rounded-sm border border-gray-200 bg-white">
@@ -344,14 +344,14 @@ export function UsersManager({
                       type="button"
                       onClick={() => handleDelete(user)}
                       className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Hapus"
+                      title="Delete"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}
                   <div className="ml-2 text-right text-xs text-gray-400">
-                    <p>{user.is_active ? 'Active' : 'Inactive'}</p>
-                    <p>Dibuat {formatDate(user.created_at)}</p>
+                  <p>{user.is_active ? 'Active' : 'Inactive'}</p>
+                  <p>Created {formatDate(user.created_at)}</p>
                   </div>
                 </div>
               </div>
@@ -379,10 +379,10 @@ export function UsersManager({
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <div>
                 <h3 className="text-sm font-bold text-gray-900">
-                  {editorMode === 'create' ? 'Tambah User Baru' : activeUser?.full_name ?? 'Edit User'}
+                  {editorMode === 'create' ? 'Add New User' : activeUser?.full_name ?? 'Edit User'}
                 </h3>
                 <p className="text-xs text-gray-400">
-                  {editorMode === 'create' ? 'Super admin dapat membuat user di bawah role-nya.' : activeUser?.id}
+                  {editorMode === 'create' ? 'Super admins can create users below their own role.' : activeUser?.id}
                 </p>
               </div>
               <button onClick={resetEditor} className="text-gray-400 hover:text-gray-900">
@@ -409,7 +409,7 @@ export function UsersManager({
                       className="w-full rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900"
                     />
                   </Field>
-                  <Field label="Konfirmasi Password">
+                  <Field label="Confirm Password">
                     <input
                       value={passwordConfirmationDraft}
                       onChange={(e) => setPasswordConfirmationDraft(e.target.value)}
@@ -452,7 +452,7 @@ export function UsersManager({
                   onChange={(e) => setIsActiveDraft(e.target.checked)}
                   className="h-4 w-4 accent-gray-900"
                 />
-                Pengguna aktif
+                User is active
               </label>
 
               {canEditRoleAndPermissions && (
@@ -461,10 +461,10 @@ export function UsersManager({
                     <div>
                       <h4 className="flex items-center gap-2 text-sm font-bold text-gray-900">
                         <ShieldCheck className="h-4 w-4" />
-                        Hak Akses Dashboard
+                        Dashboard Access
                       </h4>
                       <p className="mt-1 text-xs text-gray-500">
-                        Centang modul yang boleh tampil dan aksi yang boleh dipakai user ini.
+                        Choose which modules are visible and which actions this user can perform.
                       </p>
                     </div>
                     <button
@@ -472,7 +472,7 @@ export function UsersManager({
                       onClick={() => setPermissionsDraft(getDefaultDashboardPermissions(roleDraft))}
                       className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900"
                     >
-                      Reset Role Default
+                      Reset Role Defaults
                     </button>
                   </div>
 
@@ -518,7 +518,7 @@ export function UsersManager({
                 className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-black disabled:opacity-50"
               >
                 {editorMode === 'create' ? <Plus className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
-                {editorMode === 'create' ? 'Buat User' : 'Simpan Perubahan'}
+                {editorMode === 'create' ? 'Create User' : 'Save Changes'}
               </button>
             </div>
           </div>

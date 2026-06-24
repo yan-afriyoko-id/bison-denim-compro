@@ -83,14 +83,14 @@ export default function EditServicePage() {
       return;
     }
 
-    toast.success('Service berhasil diperbarui');
+    toast.success('Service updated successfully');
     router.push('/dashboard/services');
     router.refresh();
   }
 
   async function handleDelete() {
     if (!service) return;
-    if (!confirm('Hapus layanan ini?')) return;
+    if (!confirm('Delete this service?')) return;
 
     const result = await deleteService(service.id);
     if (result.error) {
@@ -98,7 +98,7 @@ export default function EditServicePage() {
       return;
     }
 
-    toast.success('Service berhasil dihapus');
+    toast.success('Service deleted successfully');
     router.push('/dashboard/services');
     router.refresh();
   }
@@ -114,12 +114,12 @@ export default function EditServicePage() {
   if (!service) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <p className="text-sm text-gray-500">Layanan tidak ditemukan</p>
+        <p className="text-sm text-gray-500">Service not found</p>
         <Link
           href="/dashboard/services"
           className="mt-3 text-xs font-semibold text-gray-400 hover:text-gray-900 transition-colors"
         >
-          Kembali
+          Go back
         </Link>
       </div>
     );
@@ -134,10 +134,10 @@ export default function EditServicePage() {
           className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-900 transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Kembali ke Services
+          Back to Services
         </Link>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Edit Service</h1>
-        <p className="text-sm text-gray-400 mt-1">Perbarui detail layanan</p>
+        <p className="text-sm text-gray-400 mt-1">Update the service details.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
@@ -146,12 +146,12 @@ export default function EditServicePage() {
           <div className="border border-gray-200 bg-white rounded-sm p-5 space-y-4">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Judul *
+                Title *
               </label>
               <input
                 type="text"
                 name="title"
-                placeholder="Masukkan judul layanan"
+                placeholder="Enter a service title"
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
@@ -187,18 +187,18 @@ export default function EditServicePage() {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors resize-none rounded-sm"
-                placeholder="Deskripsi singkat layanan"
+                placeholder="Short summary"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Icon <span className="text-gray-400 normal-case">(opsional)</span>
+                Icon <span className="text-gray-400 normal-case">(optional)</span>
               </label>
               <input
                 type="text"
                 name="icon"
-                placeholder="Nama icon"
+                placeholder="Icon name"
                 defaultValue={service.icon ?? ''}
                 className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
               />
@@ -210,29 +210,29 @@ export default function EditServicePage() {
               defaultValue={coverImage}
               onChange={setCoverImage}
               aspectClass="aspect-[4/3]"
-              hint="Upload file atau tempel URL gambar cover"
+              hint="Upload a file or paste a cover image URL"
             />
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Konten
+                Content
               </label>
               <RichTextEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Tulis detail layanan di sini..."
+                placeholder="Write the service details here..."
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Features <span className="text-gray-400 normal-case">(gunakan list untuk keunggulan)</span>
+                Features <span className="text-gray-400 normal-case">(use a list for key benefits)</span>
               </label>
               <RichTextEditor
                 value={features}
                 onChange={setFeatures}
                 mode="list"
-                placeholder="Tulis keunggulan layanan..."
+                placeholder="Write the key benefits here..."
               />
             </div>
 
@@ -245,7 +245,7 @@ export default function EditServicePage() {
                   type="text"
                   value={ctaLabel}
                   onChange={(e) => setCtaLabel(e.target.value)}
-                  placeholder="Beli Sekarang"
+                  placeholder="Shop Now"
                   className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
                 />
               </div>
@@ -314,21 +314,21 @@ export default function EditServicePage() {
               className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Hapus Service
+              Delete Service
             </button>
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard/services"
                 className="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
               >
-                Batal
+                Cancel
               </Link>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
               >
-                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>
@@ -338,7 +338,7 @@ export default function EditServicePage() {
         <div className="lg:col-span-2">
           <div className="sticky top-0">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-              Preview Tampilan
+              Live Preview
             </p>
             <div className="border border-gray-200 bg-white rounded-sm overflow-hidden">
               <div className="relative aspect-[4/3] bg-gray-50">
@@ -358,10 +358,10 @@ export default function EditServicePage() {
               </div>
               <div className="p-5">
                 <h3 className="text-sm font-bold text-gray-900 mb-1.5">
-                  {title || 'Judul Service'}
+                  {title || 'Service Title'}
                 </h3>
                 <p className="text-gray-500 text-xs leading-relaxed">
-                  {excerpt || 'Deskripsi singkat service akan tampil di sini...'}
+                  {excerpt || 'The short service summary will appear here...'}
                 </p>
                 <div className="mt-3 border-t border-gray-100 pt-3">
                   <RichTextRenderer content={content} className="text-[11px] leading-relaxed text-gray-400" />
@@ -373,7 +373,7 @@ export default function EditServicePage() {
               </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
-              Beginilah tampilan service di landing page.
+              This is how the service will appear on the public website.
             </p>
           </div>
         </div>

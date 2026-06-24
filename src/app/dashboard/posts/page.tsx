@@ -72,18 +72,18 @@ export default async function PostsPage({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Posts</h1>
-            <p className="mt-1 text-sm text-gray-400">Kelola artikel & berita</p>
+            <p className="mt-1 text-sm text-gray-400">Manage articles and news content.</p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-end">
             <ToolbarFilters
               searchValue={search}
-              searchPlaceholder="Cari judul atau slug"
+              searchPlaceholder="Search title or slug"
               filters={[
                 {
                   name: 'status',
                   value: selectedStatus,
                   options: [
-                    { label: 'Semua status', value: '' },
+                    { label: 'All statuses', value: '' },
                     { label: 'Draft', value: 'draft' },
                     { label: 'Published', value: 'published' },
                     { label: 'Archived', value: 'archived' },
@@ -96,7 +96,7 @@ export default async function PostsPage({
               className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
             >
               <Plus className="h-4 w-4" />
-              Post Baru
+              New Post
             </Link>
           </div>
         </div>
@@ -105,8 +105,8 @@ export default async function PostsPage({
       {posts.items.length === 0 ? (
         <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
           <Newspaper className="h-10 w-10 text-gray-300 mb-4" />
-          <p className="text-sm text-gray-500">Belum ada post</p>
-          <p className="text-xs text-gray-400 mt-1">Buat post pertama Anda</p>
+          <p className="text-sm text-gray-500">No posts yet</p>
+          <p className="text-xs text-gray-400 mt-1">Create your first post to get started.</p>
         </div>
       ) : (
         <div className="rounded-sm border border-gray-200 bg-white">

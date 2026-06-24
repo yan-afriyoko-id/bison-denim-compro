@@ -86,7 +86,7 @@ export function GalleryInput({ value, onChange }: GalleryInputProps) {
             defaultValue={item}
             onChange={(nextValue) => updateAt(index, nextValue)}
             aspectClass="aspect-[4/3]"
-            hint="Upload gambar gallery atau tempel URL"
+            hint="Upload a gallery image or paste an image URL"
           />
         </div>
       ))}
@@ -97,7 +97,7 @@ export function GalleryInput({ value, onChange }: GalleryInputProps) {
         className="inline-flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:border-gray-900 hover:text-gray-900"
       >
         <Plus className="h-3.5 w-3.5" />
-        Tambah Gambar
+        Add Image
       </button>
     </div>
   );

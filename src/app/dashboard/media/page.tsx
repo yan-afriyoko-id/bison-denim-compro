@@ -72,17 +72,17 @@ export default function MediaPage() {
       }
     }
     setUploading(false);
-    toast.success('Upload selesai');
+    toast.success('Upload completed');
     loadMedia();
   }
 
   async function handleDelete(item: Media) {
-    if (!confirm(`Hapus "${item.filename}"?`)) return;
+    if (!confirm(`Delete "${item.filename}"?`)) return;
     const result = await deleteMediaItem(item.id, item.path);
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success('Media dihapus');
+      toast.success('Media deleted');
       setSelected(null);
       loadMedia();
     }
@@ -90,7 +90,7 @@ export default function MediaPage() {
 
   function copyValue(value: string, label: string) {
     navigator.clipboard.writeText(value).then(() => {
-      toast.success(`${label} disalin`);
+      toast.success(`${label} copied`);
     });
   }
 
@@ -113,7 +113,7 @@ export default function MediaPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Media Library</h1>
-            <p className="mt-1 text-sm text-gray-400">Kelola file media</p>
+            <p className="mt-1 text-sm text-gray-400">Manage media files</p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
             <label className="relative md:min-w-[260px]">
@@ -125,11 +125,11 @@ export default function MediaPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Cari file media"
+                placeholder="Search media files"
                 className="w-full rounded-sm border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 outline-none transition-colors focus:border-gray-900"
               />
             </label>
-            <div className="text-right text-xs text-gray-400">{media.length} file</div>
+            <div className="text-right text-xs text-gray-400">{media.length} files</div>
           </div>
         </div>
       </div>
@@ -160,20 +160,20 @@ export default function MediaPage() {
         {uploading ? (
           <div className="flex flex-col items-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-400 mb-3" />
-            <p className="text-sm text-gray-500">Mengunggah...</p>
+            <p className="text-sm text-gray-500">Uploading...</p>
           </div>
         ) : (
           <>
             <Upload className="h-8 w-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-semibold text-gray-700 mb-1">Drag &amp; drop gambar ke sini</p>
-            <p className="text-xs text-gray-400 mb-4">atau klik untuk memilih file (maks 8MB per file)</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">Drag and drop images here</p>
+            <p className="text-xs text-gray-400 mb-4">or click to choose files (max 8MB per file)</p>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 text-xs font-bold rounded-sm hover:bg-black transition-colors"
             >
               <Upload className="h-3.5 w-3.5" />
-              Pilih File
+              Choose Files
             </button>
           </>
         )}
@@ -186,8 +186,8 @@ export default function MediaPage() {
       ) : filteredMedia.length === 0 ? (
         <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
           <ImageIcon className="h-10 w-10 text-gray-300 mb-4" />
-          <p className="text-sm text-gray-500">{media.length === 0 ? 'Belum ada media' : 'Tidak ada hasil pencarian'}</p>
-          <p className="text-xs text-gray-400 mt-1">{media.length === 0 ? 'Upload media pertama Anda' : 'Coba kata kunci lain'}</p>
+          <p className="text-sm text-gray-500">{media.length === 0 ? 'No media yet' : 'No search results'}</p>
+          <p className="text-xs text-gray-400 mt-1">{media.length === 0 ? 'Upload your first media file' : 'Try a different keyword'}</p>
         </div>
       ) : (
         <>
@@ -234,7 +234,7 @@ export default function MediaPage() {
           {selectedItem && (
             <div className="border border-gray-200 bg-white rounded-sm p-5 space-y-4">
               <div className="flex items-start justify-between">
-                <h3 className="text-sm font-bold text-gray-900">Detail Media</h3>
+                <h3 className="text-sm font-bold text-gray-900">Media Details</h3>
                 <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-900 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
@@ -252,11 +252,11 @@ export default function MediaPage() {
                     <p className="text-sm text-gray-900 truncate">{selectedItem.filename}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Tipe</p>
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Type</p>
                     <p className="text-sm text-gray-600">{selectedItem.mime_type}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ukuran</p>
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Size</p>
                     <p className="text-sm text-gray-600">{formatBytes(selectedItem.size_bytes)}</p>
                   </div>
                   <div>
@@ -275,21 +275,21 @@ export default function MediaPage() {
                     value={altTextDraft}
                     onChange={(e) => setAltTextDraft(e.target.value)}
                     className="flex-1 rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900"
-                    placeholder="Isi alt text gambar"
+                    placeholder="Enter image alt text"
                   />
                   <button
                     onClick={async () => {
                       const result = await updateMediaAltText(selectedItem.id, altTextDraft);
                       if (result.error) toast.error(result.error);
                       else {
-                        toast.success('Alt text disimpan');
+                        toast.success('Alt text saved');
                         loadMedia();
                       }
                     }}
                     className="flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-2 text-xs font-bold text-white hover:bg-black"
                   >
                     <Save className="h-3.5 w-3.5" />
-                    Simpan
+                    Save
                   </button>
                 </div>
               </div>
@@ -310,14 +310,14 @@ export default function MediaPage() {
                   className="flex items-center gap-1.5 border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors rounded-sm"
                 >
                   <Copy className="h-3.5 w-3.5" />
-                  Salin URL
+                  Copy URL
                 </button>
                 <button
                   onClick={() => copyValue(selectedItem.path, 'Path')}
                   className="flex items-center gap-1.5 border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors rounded-sm"
                 >
                   <Copy className="h-3.5 w-3.5" />
-                  Salin Path
+                  Copy Path
                 </button>
                 <a
                   href={selectedPublicUrl}
@@ -326,14 +326,14 @@ export default function MediaPage() {
                   className="flex items-center gap-1.5 border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors rounded-sm"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  Buka
+                  Open
                 </a>
                 <button
                   onClick={() => handleDelete(selectedItem)}
                   className="ml-auto flex items-center gap-1.5 rounded-sm border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Hapus
+                  Delete
                 </button>
               </div>
             </div>

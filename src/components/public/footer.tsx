@@ -38,7 +38,7 @@ export async function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">Tentang</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">About</h4>
             <ul className="space-y-2.5">
               <li>
                 <Link href="/about/company-information" className="text-sm text-[#555] hover:text-black">
@@ -49,7 +49,7 @@ export async function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">Produk</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">Products</h4>
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.href}>
@@ -62,7 +62,7 @@ export async function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">Kontak</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#999] mb-4">Contact</h4>
             <ul className="space-y-2.5 text-sm text-[#555]">
               <li className="leading-relaxed">
                 {grouped.contact.contact_address || 'Alamat perusahaan dapat diatur dari dashboard settings.'}
@@ -84,8 +84,8 @@ export async function Footer() {
         <div className="pt-8 border-t border-[#d4d4d4] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[#999]">&copy; {new Date().getFullYear()} {grouped.brand.site_name || 'Bison Denim'}. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/site-policy" className="text-xs text-[#999] hover:text-[#555]">Kebijakan Situs</Link>
-            <Link href="/privacy-policy" className="text-xs text-[#999] hover:text-[#555]">Kebijakan Privasi</Link>
+            <Link href="/site-policy" className="text-xs text-[#999] hover:text-[#555]">Site Policy</Link>
+            <Link href="/privacy-policy" className="text-xs text-[#999] hover:text-[#555]">Privacy Policy</Link>
           </div>
         </div>
       </div>

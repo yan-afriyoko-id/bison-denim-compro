@@ -209,8 +209,32 @@ button:disabled,
 }
 
 .goog-te-banner-frame.skiptranslate,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight,
 .goog-logo-link,
 .goog-te-gadget > span,
-#google_translate_element {
+#google_translate_element,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-aZ2wEe,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd,
+iframe.skiptranslate {
   display: none !important;
+}
+
+body > .skiptranslate,
+body > .skiptranslate iframe {
+  display: none !important;
+}
+
+body.translated-ltr,
+body.translated-rtl {
+  top: 0 !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
 }

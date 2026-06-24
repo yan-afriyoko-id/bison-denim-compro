@@ -35,7 +35,7 @@ export async function createDashboardUser(data: {
   }
 
   if (!actor || !canAssignRole(actor.role, data.role)) {
-    return { error: 'Anda hanya dapat membuat user dengan role di bawah akun Anda.' };
+    return { error: 'You can only create users with a lower role than your own.' };
   }
 
   const email = data.email.trim().toLowerCase();
@@ -43,15 +43,15 @@ export async function createDashboardUser(data: {
   const fullName = normalizeDbText(data.full_name ?? null);
 
   if (!email) {
-    return { error: 'Email wajib diisi.' };
+    return { error: 'Email is required.' };
   }
 
   if (password.length < 8) {
-    return { error: 'Password minimal 8 karakter.' };
+    return { error: 'Password must be at least 8 characters.' };
   }
 
   if (password !== data.password_confirmation.trim()) {
-    return { error: 'Konfirmasi password tidak sama.' };
+    return { error: 'Password confirmation does not match.' };
   }
 
   const permissions = normalizeDashboardPermissions(data.role, data.dashboard_permissions);
@@ -67,7 +67,7 @@ export async function createDashboardUser(data: {
   });
 
   if (createError || !createdUser.user) {
-    return { error: friendlyDbError(createError?.message ?? 'Gagal membuat user baru.') };
+    return { error: friendlyDbError(createError?.message ?? 'Failed to create a new user.') };
   }
 
   const profilePayload = {
@@ -99,7 +99,7 @@ export async function createDashboardUser(data: {
   });
 
   revalidatePath('/dashboard/users');
-  return { success: 'User berhasil dibuat', userId: createdUser.user.id };
+  return { success: 'User created successfully', userId: createdUser.user.id };
 }
 
 export async function updateUserProfile(
@@ -112,26 +112,26 @@ export async function updateUserProfile(
   }
 
   if (actor?.id === userId && data.role && data.role !== actor.role) {
-    return { error: 'Anda tidak dapat mengubah role akun sendiri.' };
+    return { error: 'You cannot change your own role.' };
   }
 
   if (actor?.id === userId && data.dashboard_permissions) {
-    return { error: 'Anda tidak dapat mengubah permission akun sendiri.' };
+    return { error: 'You cannot change your own permissions.' };
   }
 
   if ((data.role || data.dashboard_permissions) && (!hasMinimumRole(actor, 'super_admin') || !hasDashboardModuleActionAccess(actor, 'users', 'manage'))) {
-    return { error: 'Hanya super admin yang dapat mengubah role dan permission user.' };
+    return { error: 'Only super admins can change user roles and permissions.' };
   }
 
   if (data.role && !canAssignRole(actor!.role, data.role)) {
-    return { error: 'Anda hanya dapat menetapkan role di bawah akun Anda.' };
+    return { error: 'You can only assign roles below your own.' };
   }
 
   const supabase = createAdminClient();
   const { data: before } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
   if (data.role && before?.role && actor && !canAssignRole(actor.role, before.role)) {
-    return { error: 'Anda tidak dapat mengubah user dengan role setara atau lebih tinggi.' };
+    return { error: 'You cannot edit users with an equal or higher role.' };
   }
 
   const normalizedPermissions =
@@ -163,7 +163,7 @@ export async function updateUserProfile(
   });
 
   revalidatePath('/dashboard/users');
-  return { success: 'Pengguna berhasil diperbarui' };
+  return { success: 'User updated successfully' };
 }
 
 export async function deleteUser(userId: string) {
@@ -173,7 +173,7 @@ export async function deleteUser(userId: string) {
   }
 
   if (actor?.id === userId) {
-    return { error: 'Anda tidak dapat menghapus akun sendiri.' };
+    return { error: 'You cannot delete your own account.' };
   }
 
   const supabase = createAdminClient();
@@ -185,15 +185,15 @@ export async function deleteUser(userId: string) {
     .single();
 
   if (fetchError || !target) {
-    return { error: 'User tidak ditemukan.' };
+    return { error: 'User not found.' };
   }
 
   if (target.role === 'super_admin') {
-    return { error: 'Tidak dapat menghapus super admin lain.' };
+    return { error: 'You cannot delete another super admin.' };
   }
 
   if (actor && !canAssignRole(actor.role, target.role)) {
-    return { error: 'Anda hanya dapat menghapus user dengan role di bawah akun Anda.' };
+    return { error: 'You can only delete users with a lower role than your own.' };
   }
 
   const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(userId);
@@ -215,5 +215,5 @@ export async function deleteUser(userId: string) {
   });
 
   revalidatePath('/dashboard/users');
-  return { success: 'User berhasil dihapus' };
+  return { success: 'User deleted successfully' };
 }

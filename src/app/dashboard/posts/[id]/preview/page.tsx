@@ -41,12 +41,12 @@ export default function PreviewPostPage() {
   if (!post) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-sm text-gray-500">Post tidak ditemukan</p>
+        <p className="text-sm text-gray-500">Post not found</p>
         <Link
           href="/dashboard/posts"
           className="mt-3 text-xs font-semibold text-gray-400 hover:text-gray-900 transition-colors"
         >
-          Kembali ke Posts
+          Back to Posts
         </Link>
       </div>
     );
@@ -63,7 +63,7 @@ export default function PreviewPostPage() {
             <Eye className="h-4 w-4" />
             <span className="font-semibold">Preview Mode</span>
             {post.status !== 'published' && (
-              <span className="text-amber-600">— Post ini belum dipublikasikan</span>
+              <span className="text-amber-600">- This post is not published yet</span>
             )}
           </div>
           <Link
@@ -71,7 +71,7 @@ export default function PreviewPostPage() {
             className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Kembali
+            Back
           </Link>
         </div>
       </div>
@@ -133,3 +133,4 @@ export default function PreviewPostPage() {
     </div>
   );
 }
+

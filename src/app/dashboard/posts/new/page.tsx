@@ -51,7 +51,7 @@ export default function NewPostPage() {
       return;
     }
 
-    toast.success('Post berhasil dibuat');
+    toast.success('Post created successfully');
     router.push('/dashboard/posts');
     router.refresh();
   }
@@ -65,10 +65,10 @@ export default function NewPostPage() {
           className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-900 transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Kembali ke Posts
+          Back to Posts
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Post Baru</h1>
-        <p className="text-sm text-gray-400 mt-1">Buat artikel / berita baru</p>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">New Post</h1>
+        <p className="text-sm text-gray-400 mt-1">Create a new article or news post.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
@@ -77,12 +77,12 @@ export default function NewPostPage() {
           <div className="border border-gray-200 bg-white rounded-sm p-5 space-y-4">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Judul *
+                Title *
               </label>
               <input
                 type="text"
                 name="title"
-                placeholder="Masukkan judul post"
+                placeholder="Enter a post title"
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
@@ -114,7 +114,7 @@ export default function NewPostPage() {
                 rows={2}
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Ringkasan singkat post"
+                placeholder="Short post summary"
                 className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors resize-none rounded-sm"
               />
             </div>
@@ -125,17 +125,17 @@ export default function NewPostPage() {
               defaultValue={coverImage}
               onChange={setCoverImage}
               aspectClass="aspect-[4/3]"
-              hint="Upload file atau tempel URL gambar cover"
+              hint="Upload a file or paste a cover image URL"
             />
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Konten
+                Content
               </label>
               <RichTextEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Tulis isi post di sini..."
+                placeholder="Write the post content here..."
               />
             </div>
 
@@ -157,12 +157,12 @@ export default function NewPostPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  SEO Title <span className="text-gray-400 normal-case">(opsional)</span>
+                  SEO Title <span className="text-gray-400 normal-case">(optional)</span>
                 </label>
                 <input
                   type="text"
                   name="seo_title"
-                  placeholder="Judul SEO"
+                  placeholder="SEO title"
                   className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
                 />
               </div>
@@ -178,7 +178,7 @@ export default function NewPostPage() {
                   rows={3}
                   value={seoDescription}
                   onChange={(e) => setSeoDescription(e.target.value)}
-                  placeholder="Deskripsi SEO"
+                  placeholder="SEO description"
                   className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors resize-none rounded-sm"
                 />
               </div>
@@ -206,14 +206,14 @@ export default function NewPostPage() {
               href="/dashboard/posts"
               className="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
             >
-              Batal
+              Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
               className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
             >
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>
@@ -222,7 +222,7 @@ export default function NewPostPage() {
         <div className="lg:col-span-2">
           <div className="sticky top-0">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-              Preview Tampilan
+              Live Preview
             </p>
             <div className="border border-gray-200 bg-white rounded-sm overflow-hidden">
               <div className="relative aspect-[4/3] bg-gray-50">
@@ -242,10 +242,10 @@ export default function NewPostPage() {
               </div>
               <div className="p-5">
                 <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  BERITA
+                  NEWS
                 </span>
                 <h3 className="text-gray-900 font-bold text-sm leading-snug mt-1">
-                  {title || 'Judul Post'}
+                  {title || 'Post Title'}
                 </h3>
                 {excerpt && (
                   <p className="text-gray-500 text-xs leading-relaxed mt-2">{excerpt}</p>
@@ -256,7 +256,7 @@ export default function NewPostPage() {
               </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
-              Beginilah tampilan post di landing page &amp; news page.
+              This is how the post will appear on the homepage and news page.
             </p>
           </div>
         </div>

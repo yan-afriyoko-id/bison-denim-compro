@@ -61,7 +61,7 @@ export default function NewServicePage() {
       return;
     }
 
-    toast.success('Service berhasil dibuat');
+    toast.success('Service created successfully');
     router.push('/dashboard/services');
     router.refresh();
   }
@@ -75,10 +75,10 @@ export default function NewServicePage() {
           className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-900 transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Kembali ke Services
+          Back to Services
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Service Baru</h1>
-        <p className="text-sm text-gray-400 mt-1">Tambahkan produk/service baru</p>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">New Service</h1>
+        <p className="text-sm text-gray-400 mt-1">Create a new product or service entry.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
@@ -87,12 +87,12 @@ export default function NewServicePage() {
           <div className="border border-gray-200 bg-white rounded-sm p-5 space-y-4">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Judul *
+                Title *
               </label>
               <input
                 type="text"
                 name="title"
-                placeholder="Masukkan judul"
+                placeholder="Enter a title"
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 required
@@ -124,31 +124,31 @@ export default function NewServicePage() {
                 rows={3}
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Deskripsi singkat"
+                placeholder="Short summary"
                 className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors resize-none rounded-sm"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Konten
+                Content
               </label>
               <RichTextEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Tulis detail layanan di sini..."
+                placeholder="Write the service details here..."
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                Features <span className="text-gray-400 normal-case">(gunakan list untuk keunggulan)</span>
+                Features <span className="text-gray-400 normal-case">(use a list for key benefits)</span>
               </label>
               <RichTextEditor
                 value={features}
                 onChange={setFeatures}
                 mode="list"
-                placeholder="Tulis keunggulan layanan..."
+                placeholder="Write the key benefits here..."
               />
             </div>
 
@@ -161,7 +161,7 @@ export default function NewServicePage() {
                   type="text"
                   value={ctaLabel}
                   onChange={(e) => setCtaLabel(e.target.value)}
-                  placeholder="Beli Sekarang"
+                  placeholder="Shop Now"
                   className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
                 />
               </div>
@@ -182,12 +182,12 @@ export default function NewServicePage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  Icon <span className="text-gray-400 normal-case">(opsional)</span>
+                  Icon <span className="text-gray-400 normal-case">(optional)</span>
                 </label>
                 <input
                   type="text"
                   name="icon"
-                  placeholder="Nama icon"
+                  placeholder="Icon name"
                   className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
                 />
               </div>
@@ -199,7 +199,7 @@ export default function NewServicePage() {
               defaultValue={coverImage}
               onChange={setCoverImage}
               aspectClass="aspect-[4/3]"
-              hint="Upload file atau tempel URL gambar cover"
+              hint="Upload a file or paste a cover image URL"
             />
 
             <div className="grid grid-cols-3 gap-4">
@@ -254,14 +254,14 @@ export default function NewServicePage() {
               href="/dashboard/services"
               className="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
             >
-              Batal
+              Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
               className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
             >
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>
@@ -270,7 +270,7 @@ export default function NewServicePage() {
         <div className="lg:col-span-2">
           <div className="sticky top-0">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-              Preview Tampilan
+              Live Preview
             </p>
             {/* Mirror ImageInput value into preview state */}
             <div className="border border-gray-200 bg-white rounded-sm overflow-hidden">
@@ -291,10 +291,10 @@ export default function NewServicePage() {
               </div>
               <div className="p-5">
                 <h3 className="text-sm font-bold text-gray-900 mb-1.5">
-                  {title || 'Judul Service'}
+                  {title || 'Service Title'}
                 </h3>
                 <p className="text-gray-500 text-xs leading-relaxed">
-                  {excerpt || 'Deskripsi singkat service akan tampil di sini...'}
+                  {excerpt || 'The short service summary will appear here...'}
                 </p>
                 <div className="mt-3 border-t border-gray-100 pt-3">
                   <RichTextRenderer content={content} className="text-[11px] leading-relaxed text-gray-400" />
@@ -306,7 +306,7 @@ export default function NewServicePage() {
               </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
-              Beginilah tampilan service di landing page.
+              This is how the service will appear on the public website.
             </p>
           </div>
         </div>

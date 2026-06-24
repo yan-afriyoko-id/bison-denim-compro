@@ -85,7 +85,7 @@ export function NavigationManager({
 
   async function handleSave() {
     if (!draft.label.trim() || !draft.href.trim()) {
-      toast.error('Label dan link wajib diisi');
+      toast.error('Label and link are required.');
       return;
     }
 
@@ -109,24 +109,24 @@ export function NavigationManager({
       setItems((prev) =>
         prev.map((item) => (item.id === draft.id ? { ...item, ...payload } : item))
       );
-      toast.success('Navigasi diperbarui');
+      toast.success('Navigation updated');
       closeEditor();
       return;
     }
 
     const result = await createNavigationItem(payload);
     if (result.error || !result.data) {
-      toast.error(result.error ?? 'Gagal membuat item navigasi');
+      toast.error(result.error ?? 'Failed to create navigation item');
       return;
     }
 
     setItems((prev) => [...prev, result.data as NavigationItem]);
-    toast.success('Navigasi dibuat');
+    toast.success('Navigation created');
     closeEditor();
   }
 
   async function handleDelete(itemId: string) {
-    if (!confirm('Hapus item navigasi ini?')) {
+    if (!confirm('Delete this navigation item?')) {
       return;
     }
 
@@ -137,7 +137,7 @@ export function NavigationManager({
     }
 
     setItems((prev) => prev.filter((item) => item.id !== itemId && item.parent_id !== itemId));
-    toast.success('Navigasi dihapus');
+    toast.success('Navigation deleted');
   }
 
   return (
@@ -146,7 +146,7 @@ export function NavigationManager({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Header Navigation</h1>
-            <p className="mt-1 text-sm text-gray-400">Kelola menu desktop dan mobile dari satu source</p>
+            <p className="mt-1 text-sm text-gray-400">Manage desktop and mobile menus from one source.</p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <label className="relative min-w-[260px]">
@@ -157,7 +157,7 @@ export function NavigationManager({
                   setSearch(event.target.value);
                   setPage(1);
                 }}
-                placeholder="Cari label atau href"
+                placeholder="Search label or href"
                 className="w-full rounded-sm border border-gray-200 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-900"
               />
             </label>
@@ -167,7 +167,7 @@ export function NavigationManager({
               className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
             >
               <Plus className="h-4 w-4" />
-              Item Baru
+              New Item
             </button>
           </div>
         </div>
@@ -181,15 +181,15 @@ export function NavigationManager({
                 <th className="text-left px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Label</th>
                 <th className="text-left px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Link</th>
                 <th className="text-left px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Aksi</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-20 text-center">
-                    <p className="text-sm text-gray-500">Belum ada item navigasi</p>
-                    <p className="mt-1 text-xs text-gray-400">Tambahkan item pertama untuk header</p>
+                    <p className="text-sm text-gray-500">No navigation items yet</p>
+                    <p className="mt-1 text-xs text-gray-400">Add the first item for the header</p>
                   </td>
                 </tr>
               ) : (
@@ -240,7 +240,7 @@ export function NavigationManager({
                           onClick={() => startTransition(() => void handleDelete(item.id))}
                           disabled={isPending}
                           className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                          title="Hapus"
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -274,7 +274,7 @@ export function NavigationManager({
           <div className="w-full max-w-lg border border-gray-200 bg-white rounded-sm shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                {draft.id ? 'Edit Item Navigasi' : 'Item Navigasi Baru'}
+                {draft.id ? 'Edit Navigation Item' : 'New Navigation Item'}
               </h2>
               <button
                 type="button"
@@ -291,7 +291,7 @@ export function NavigationManager({
                 <input
                   value={draft.label}
                   onChange={(event) => patchDraft('label', event.target.value)}
-                  placeholder="Beranda"
+                  placeholder="Home"
                   className="w-full rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900"
                 />
               </div>
@@ -313,7 +313,7 @@ export function NavigationManager({
                   onChange={(event) => patchDraft('parent_id', event.target.value)}
                   className="w-full rounded-sm border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900"
                 >
-                  <option value="">Tidak ada parent</option>
+                  <option value="">No parent</option>
                   {parentOptions.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.label}
@@ -329,7 +329,7 @@ export function NavigationManager({
                   onChange={(event) => patchDraft('is_visible', event.target.checked)}
                   className="h-4 w-4 accent-gray-900"
                 />
-                Tampilkan item ini
+                Show this item
               </label>
 
               <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -339,7 +339,7 @@ export function NavigationManager({
                   onChange={(event) => patchDraft('open_new_tab', event.target.checked)}
                   className="h-4 w-4 accent-gray-900"
                 />
-                Buka di tab baru
+                Open in a new tab
               </label>
             </div>
 
@@ -349,7 +349,7 @@ export function NavigationManager({
                 onClick={closeEditor}
                 className="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="button"
@@ -358,7 +358,7 @@ export function NavigationManager({
                 className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-black disabled:opacity-50"
               >
                 <Save className="h-3.5 w-3.5" />
-                {isPending ? 'Menyimpan...' : 'Simpan Item'}
+                {isPending ? 'Saving...' : 'Save Item'}
               </button>
             </div>
           </div>

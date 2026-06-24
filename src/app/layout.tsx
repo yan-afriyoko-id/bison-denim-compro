@@ -1,39 +1,42 @@
-import type { Metadata } from "next";
-import { Tajawal } from "next/font/google";
+import type { Metadata } from 'next';
+import { Tajawal } from 'next/font/google';
 import { Toaster } from 'sonner';
-import "./globals.css";
+import './globals.css';
+
 const tajawal = Tajawal({
-  variable: "--font-tajawal",
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  variable: '--font-tajawal',
+  subsets: ['latin'],
+  weight: ['200', '300', '400', '500', '700', '800', '900'],
 });
 
 const siteName = 'Bison Denim';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: `${siteName} — Fashion Berkualitas`,
+    default: `${siteName} | Quality Fashion`,
     template: `%s | ${siteName}`,
   },
-  description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
+  description: 'Quality denim, shirts, hoodies, and fashion essentials for Indonesia.',
   icons: {
     icon: '/icon.png',
     shortcut: '/icon.png',
     apple: '/icon.png',
   },
   openGraph: {
-    title: `${siteName} — Fashion Berkualitas`,
-    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+    title: `${siteName} | Quality Fashion`,
+    description: 'Quality denim, shirts, hoodies, and fashion essentials for Indonesia.',
+    url: siteUrl,
     siteName,
-    locale: 'id',
+    locale: 'en_US',
     type: 'website',
     images: [{ url: '/icon.png', alt: siteName }],
   },
   twitter: {
     card: 'summary',
-    title: `${siteName} — Fashion Berkualitas`,
-    description: 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas untuk Indonesia.',
+    title: `${siteName} | Quality Fashion`,
+    description: 'Quality denim, shirts, hoodies, and fashion essentials for Indonesia.',
     images: ['/icon.png'],
   },
   robots: {
@@ -48,11 +51,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="id"
-      className={`${tajawal.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className={`${tajawal.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
         {children}
         <Toaster
           position="bottom-right"

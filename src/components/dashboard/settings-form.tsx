@@ -13,9 +13,9 @@ const SECTION_ITEMS: Array<{
   label: string;
   description: string;
 }> = [
-  { key: 'brand', label: 'Brand', description: 'Nama situs dan logo utama.' },
-  { key: 'company', label: 'Company', description: 'Deskripsi utama perusahaan.' },
-  { key: 'contact', label: 'Contact', description: 'Email, telepon, dan alamat.' },
+  { key: 'brand', label: 'Brand', description: 'Primary site name and logo.' },
+  { key: 'company', label: 'Company', description: 'Primary company description.' },
+  { key: 'contact', label: 'Contact', description: 'Email, phone, and address.' },
 ];
 
 export function SettingsForm({
@@ -93,7 +93,7 @@ export function SettingsForm({
         return;
       }
 
-      toast.success(`${SECTION_ITEMS.find((item) => item.key === section)?.label} berhasil disimpan`);
+      toast.success(`${SECTION_ITEMS.find((item) => item.key === section)?.label} saved successfully`);
     });
   }
 
@@ -101,7 +101,7 @@ export function SettingsForm({
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-400">Pengaturan situs dalam panel terpisah per kategori.</p>
+        <p className="mt-1 text-sm text-gray-400">Site settings split into separate category panels.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -135,7 +135,7 @@ export function SettingsForm({
           {activeSection === 'brand' && (
             <SectionCard
               title="Brand"
-              description="Atur identitas merek yang dipakai di header, footer, dan elemen public lainnya."
+              description="Manage the brand identity used in the header, footer, and other public elements."
               onSave={() => saveSection('brand')}
               saving={isPending && savingSection === 'brand'}
             >
@@ -147,7 +147,7 @@ export function SettingsForm({
                 onChange={updateLogo}
                 aspectClass="aspect-[3/1]"
                 wrapperClassName="w-[220px]"
-                hint="Logo ini dipakai di header, footer, dan seluruh halaman publik"
+                hint="This logo is used across the header, footer, and public pages"
               />
               <VisibilityToggle label="Site Name Public" checked={visibility.site_name ?? true} onChange={() => toggleVisibility('site_name')} />
               <VisibilityToggle label="Logo Public" checked={visibility.logo ?? true} onChange={() => toggleVisibility('logo')} />
@@ -157,7 +157,7 @@ export function SettingsForm({
           {activeSection === 'company' && (
             <SectionCard
               title="Company"
-              description="Kelola deskripsi utama yang dipakai di halaman public dan footer."
+              description="Manage the main description used across public pages and the footer."
               onSave={() => saveSection('company')}
               saving={isPending && savingSection === 'company'}
             >
@@ -171,7 +171,7 @@ export function SettingsForm({
           {activeSection === 'contact' && (
             <SectionCard
               title="Contact"
-              description="Data kontak ini dipakai di footer, CTA, dan halaman kontak."
+              description="This contact information is used in the footer, CTA blocks, and contact page."
               onSave={() => saveSection('contact')}
               saving={isPending && savingSection === 'contact'}
             >
@@ -219,7 +219,7 @@ function SectionCard({
           disabled={saving}
           className="inline-flex items-center justify-center rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black disabled:opacity-50"
         >
-          {saving ? 'Menyimpan...' : `Simpan ${title}`}
+          {saving ? 'Saving...' : `Save ${title}`}
         </button>
       </div>
     </div>

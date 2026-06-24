@@ -8,7 +8,6 @@ export default async function ContactPage() {
     <ContactPageClient
       contactInfo={{
         siteName: grouped.brand.site_name || 'Bison Denim',
-        logoUrl: grouped.brand.logo || '/icon.png',
         description: grouped.company.site_description,
         email: grouped.contact.contact_email || 'hello@bison-denim.com',
         phone: grouped.contact.contact_phone || '+62-22-4234-567',

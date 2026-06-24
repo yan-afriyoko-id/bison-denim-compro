@@ -60,13 +60,13 @@ export default async function AuditLogsPage({
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Audit Logs</h1>
-        <p className="text-sm text-gray-400 mt-1">Log aktivitas sistem</p>
+        <p className="text-sm text-gray-400 mt-1">Track important dashboard and content changes.</p>
       </div>
 
       {logs.items.length === 0 ? (
         <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
           <ClipboardList className="h-10 w-10 text-gray-300 mb-4" />
-          <p className="text-sm text-gray-500">Belum ada audit log</p>
+          <p className="text-sm text-gray-500">No audit logs yet</p>
         </div>
       ) : (
         <div className="rounded-sm border border-gray-200 bg-white overflow-hidden">

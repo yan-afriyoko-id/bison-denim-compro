@@ -47,7 +47,7 @@ type EditablePageSection = PageSection & {
 
 const sectionTemplates: Partial<Record<SectionType, { content: Record<string, unknown>; settings?: Record<string, unknown> }>> = {
   hero: { content: { title: '', description: EMPTY_RICH_TEXT_DOCUMENT, cta_label: '', cta_href: '', image: '' } },
-  intro: { content: { title: '', body: EMPTY_RICH_TEXT_DOCUMENT, image: '', link_label: '', link_href: '' } },
+  intro: { content: { title: '', body: EMPTY_RICH_TEXT_DOCUMENT, image: '', secondary_image: '', link_label: '', link_href: '' } },
   services: { content: { title: '', description: EMPTY_RICH_TEXT_DOCUMENT, limit: 5 } },
   projects: { content: { title: '', description: '', items: [] } },
   news: { content: { title: '', description: EMPTY_RICH_TEXT_DOCUMENT, limit: 4 } },
@@ -271,7 +271,7 @@ export default function PageBuilderPage() {
     }
 
     setStatus(nextStatus);
-    toast.success(nextStatus === 'published' ? 'Halaman berhasil dipublikasikan' : 'Draft berhasil disimpan');
+    toast.success(nextStatus === 'published' ? 'Page published successfully' : 'Draft saved successfully');
   }
 
   async function handleAddSection(type: SectionType) {
@@ -280,7 +280,7 @@ export default function PageBuilderPage() {
     const template = sectionTemplates[type];
     const result = await createSection(pageId, type);
     if (result.error || !result.data) {
-      toast.error(result.error ?? 'Gagal menambah section');
+      toast.error(result.error ?? 'Failed to add section');
       return;
     }
 
@@ -299,7 +299,7 @@ export default function PageBuilderPage() {
 
   async function handleDeleteSection(sectionId: string) {
     if (!pageId) return;
-    if (!confirm('Hapus section ini?')) return;
+    if (!confirm('Delete this section?')) return;
 
     const result = await deleteSection(sectionId, pageId);
     if (result.error) {
@@ -310,7 +310,7 @@ export default function PageBuilderPage() {
     const nextSections = sections.filter((section) => section.id !== sectionId);
     setSections(nextSections);
     setActiveSectionId(nextSections[0]?.id ?? null);
-    toast.success('Section dihapus');
+    toast.success('Section deleted');
   }
 
   async function handleToggleVisibility(sectionId: string, visible: boolean) {
@@ -347,9 +347,9 @@ export default function PageBuilderPage() {
           section.id === activeSection.id ? { ...section, content, settings } : section
         )
       );
-      toast.success('Section berhasil disimpan');
+      toast.success('Section saved successfully');
     } catch {
-      toast.error('JSON content/settings tidak valid');
+      toast.error('Invalid content/settings JSON');
     }
   }
 
@@ -420,7 +420,7 @@ export default function PageBuilderPage() {
               startTransition(async () => {
                 const result = await duplicatePage(pageId);
                 if (result.error) toast.error(result.error);
-                else toast.success('Halaman berhasil diduplikasi');
+                else toast.success('Page duplicated successfully');
               })
             }
             className="flex items-center gap-1.5 border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors rounded-sm"
@@ -436,7 +436,7 @@ export default function PageBuilderPage() {
           <div className="rounded-sm border border-gray-200 bg-white p-5 space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Judul</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Title</label>
                 <input
                   value={title}
                   onChange={(event) => {
@@ -460,7 +460,7 @@ export default function PageBuilderPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Deskripsi</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -508,7 +508,7 @@ export default function PageBuilderPage() {
               defaultValue={ogImageUrl}
               onChange={setOgImageUrl}
               aspectClass="aspect-[21/9]"
-              hint="Digunakan untuk preview saat link dibagikan"
+              hint="Used for link preview when this page is shared"
             />
 
             <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -518,7 +518,7 @@ export default function PageBuilderPage() {
                 onChange={(event) => setIsIndexed(event.target.checked)}
                 className="h-4 w-4 accent-gray-900"
               />
-              Halaman boleh diindeks search engine
+              Allow search engines to index this page
             </label>
           </div>
 
@@ -526,14 +526,14 @@ export default function PageBuilderPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-bold text-gray-900">Sections</h2>
-                <p className="text-xs text-gray-400">Drag untuk mengatur urutan, klik untuk edit</p>
+                <p className="text-xs text-gray-400">Drag to reorder, click to edit</p>
               </div>
             </div>
 
             {sections.length === 0 ? (
               <div className="border border-dashed border-gray-300 bg-white rounded-sm py-24 flex flex-col items-center justify-center">
-                <p className="text-sm text-gray-500">Belum ada section</p>
-                <p className="text-xs text-gray-400 mt-1">Tambahkan section pertama Anda</p>
+                <p className="text-sm text-gray-500">No sections yet</p>
+                <p className="text-xs text-gray-400 mt-1">Add your first section to get started.</p>
               </div>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -579,7 +579,7 @@ export default function PageBuilderPage() {
             <div>
               <h3 className="text-sm font-bold text-gray-900">Section Editor</h3>
               <p className="text-xs text-gray-400 mt-1">
-                Section yang didukung akan memakai form terstruktur dan Rich Text Editor. JSON raw tetap tersedia sebagai fallback untuk section kompleks.
+                Supported sections use a structured form and rich text editor. Raw JSON remains available as a fallback for complex sections.
               </p>
             </div>
 
@@ -651,11 +651,11 @@ export default function PageBuilderPage() {
                   onClick={() => void handleSaveSection()}
                   className="w-full rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-black"
                 >
-                  Simpan Section
+                  Save Section
                 </button>
               </>
             ) : (
-              <p className="text-sm text-gray-400">Pilih section untuk mulai mengedit.</p>
+              <p className="text-sm text-gray-400">Select a section to start editing.</p>
             )}
           </div>
 
@@ -668,7 +668,7 @@ export default function PageBuilderPage() {
                   if (result.error) toast.error(result.error);
                   else {
                     setStatus('archived');
-                    toast.success('Halaman diarsipkan');
+                    toast.success('Page archived successfully');
                   }
                 })
               }
@@ -697,7 +697,7 @@ function StructuredSectionEditor({
       return (
         <div className="space-y-4">
           <TextField label="Title" value={typeof content.title === 'string' ? content.title : ''} onChange={(value) => onContentChange('title', value)} />
-          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Tulis deskripsi hero..." />
+          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Write the hero description..." />
           <TextField label="Image URL" value={typeof content.image === 'string' ? content.image : ''} onChange={(value) => onContentChange('image', value)} />
           <div className="grid gap-4 md:grid-cols-2">
             <TextField label="CTA Label" value={typeof content.cta_label === 'string' ? content.cta_label : ''} onChange={(value) => onContentChange('cta_label', value)} />
@@ -709,8 +709,11 @@ function StructuredSectionEditor({
       return (
         <div className="space-y-4">
           <TextField label="Title" value={typeof content.title === 'string' ? content.title : ''} onChange={(value) => onContentChange('title', value)} />
-          <RichTextEditor label="Body" value={content.body} onChange={(value) => onContentChange('body', value)} placeholder="Tulis body intro..." />
-          <TextField label="Image URL" value={typeof content.image === 'string' ? content.image : ''} onChange={(value) => onContentChange('image', value)} />
+          <RichTextEditor label="Body" value={content.body} onChange={(value) => onContentChange('body', value)} placeholder="Write the intro body..." />
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Primary Image URL" value={typeof content.image === 'string' ? content.image : ''} onChange={(value) => onContentChange('image', value)} />
+            <TextField label="Secondary Image URL" value={typeof content.secondary_image === 'string' ? content.secondary_image : ''} onChange={(value) => onContentChange('secondary_image', value)} />
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             <TextField label="Link Label" value={typeof content.link_label === 'string' ? content.link_label : ''} onChange={(value) => onContentChange('link_label', value)} />
             <TextField label="Link Href" value={typeof content.link_href === 'string' ? content.link_href : ''} onChange={(value) => onContentChange('link_href', value)} />
@@ -726,7 +729,7 @@ function StructuredSectionEditor({
             label="Description"
             value={content.description}
             onChange={(value) => onContentChange('description', value)}
-            placeholder={`Tulis deskripsi ${section.section_type}...`}
+            placeholder={`Write the ${section.section_type} description...`}
           />
           <NumberField
             label="Limit"
@@ -739,14 +742,14 @@ function StructuredSectionEditor({
       return (
         <div className="space-y-4">
           <TextField label="Title" value={typeof content.title === 'string' ? content.title : ''} onChange={(value) => onContentChange('title', value)} />
-          <RichTextEditor label="Body" value={content.body} onChange={(value) => onContentChange('body', value)} placeholder="Tulis konten..." />
+          <RichTextEditor label="Body" value={content.body} onChange={(value) => onContentChange('body', value)} placeholder="Write the content..." />
         </div>
       );
     case 'cta':
       return (
         <div className="space-y-4">
           <TextField label="Title" value={typeof content.title === 'string' ? content.title : ''} onChange={(value) => onContentChange('title', value)} />
-          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Tulis deskripsi CTA..." />
+          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Write the CTA description..." />
           <div className="grid gap-4 md:grid-cols-2">
             <TextField label="Button Label" value={typeof content.button_label === 'string' ? content.button_label : ''} onChange={(value) => onContentChange('button_label', value)} />
             <TextField label="Button Href" value={typeof content.button_href === 'string' ? content.button_href : ''} onChange={(value) => onContentChange('button_href', value)} />
@@ -757,7 +760,7 @@ function StructuredSectionEditor({
       return (
         <div className="space-y-4">
           <TextField label="Title" value={typeof content.title === 'string' ? content.title : ''} onChange={(value) => onContentChange('title', value)} />
-          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Tulis deskripsi contact..." />
+          <RichTextEditor label="Description" value={content.description} onChange={(value) => onContentChange('description', value)} placeholder="Write the contact description..." />
           <div className="grid gap-4 md:grid-cols-2">
             <TextField label="Email" value={typeof content.email === 'string' ? content.email : ''} onChange={(value) => onContentChange('email', value)} />
             <TextField label="Phone" value={typeof content.phone === 'string' ? content.phone : ''} onChange={(value) => onContentChange('phone', value)} />
@@ -802,7 +805,7 @@ function SectionContentPreview({ section }: { section: EditablePageSection }) {
     );
   }
 
-  return <p className="text-sm text-gray-400">Preview belum tersedia untuk section ini.</p>;
+  return <p className="text-sm text-gray-400">Preview is not available for this section yet.</p>;
 }
 
 function TextField({
@@ -866,33 +869,33 @@ function CreatePageForm() {
 
     const result = await createPage(formData);
     if (result.error || !result.data) {
-      setError(result.error ?? 'Gagal membuat halaman');
+      setError(result.error ?? 'Failed to create page');
       setPending(false);
       return;
     }
 
-    toast.success('Halaman berhasil dibuat');
+    toast.success('Page created successfully');
     router.push(`/dashboard/pages/builder?id=${result.data.id}`);
   }
 
   return (
     <div className="max-w-md mx-auto pt-20">
       <div className="border border-gray-200 bg-white rounded-sm p-6 space-y-5">
-        <h1 className="text-xl font-bold text-gray-900">Buat Halaman Baru</h1>
+        <h1 className="text-xl font-bold text-gray-900">Create New Page</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Judul Halaman *</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Page Title *</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Masukkan judul halaman"
+              placeholder="Enter page title"
               required
               className="w-full bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors rounded-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Deskripsi</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -906,7 +909,7 @@ function CreatePageForm() {
             disabled={pending}
             className="w-full bg-gray-900 text-white py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
           >
-            {pending ? 'Membuat...' : 'Buat Halaman'}
+            {pending ? 'Creating...' : 'Create Page'}
           </button>
         </form>
       </div>
