@@ -155,6 +155,19 @@ function applyMarks(node: ReactNode, marks?: RichTextMark[]) {
         return <em key={`mark-${index}`}>{acc}</em>;
       case 'underline':
         return <u key={`mark-${index}`}>{acc}</u>;
+      case 'textStyle': {
+        const color = typeof mark.attrs?.color === 'string' ? mark.attrs.color : undefined;
+
+        if (!color) {
+          return acc;
+        }
+
+        return (
+          <span key={`mark-${index}`} style={{ color }}>
+            {acc}
+          </span>
+        );
+      }
       case 'link': {
         const href = typeof mark.attrs?.href === 'string' ? mark.attrs.href : '#';
         return (

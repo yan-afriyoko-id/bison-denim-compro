@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeroSlider, type HeroSlide } from '@/components/public/hero-slider';
+import { getSectionColorStyles } from '@/lib/page-section-styles';
 import { hasRichTextContent, RichTextRenderer } from '@/lib/rich-text';
 import {
   FALLBACK_HOMEPAGE_SECTIONS,
@@ -61,7 +62,12 @@ function renderSection(
   const content = getSectionContent(section);
 
   switch (section.section_type) {
-    case 'intro':
+    case 'intro': {
+      const styles = getSectionColorStyles(section, {
+        titleColor: '#1E1E1E',
+        bodyColor: '#555555',
+        linkColor: '#1E1E1E',
+      });
       const primaryImage = getText(content.image);
       const secondaryImage =
         getText(content.secondary_image) ||
@@ -71,17 +77,20 @@ function renderSection(
         <section key={section.id} className="px-6 py-24">
           <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <h2 className="mb-6 text-3xl font-bold leading-tight text-[#1E1E1E] sm:text-4xl">
+              <h2 className="mb-6 text-3xl font-bold leading-tight sm:text-4xl" style={styles.titleStyle}>
                 {getText(content.title, 'About Us')}
               </h2>
               <RichTextRenderer
                 content={hasRichTextContent(content.body) ? content.body : ''}
-                className="max-w-xl text-base leading-relaxed text-[#555]"
+                className="max-w-xl text-base leading-relaxed [&_a]:underline"
+                style={styles.bodyStyle}
+                linkColor={styles.linkColor}
               />
               {getText(content.link_label) && getText(content.link_href) && (
                 <Link
                   href={getText(content.link_href)}
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:opacity-60"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold transition-colors duration-200 hover:opacity-60"
+                  style={styles.titleStyle}
                 >
                   {getText(content.link_label)} &rarr;
                 </Link>
@@ -114,20 +123,28 @@ function renderSection(
           </div>
         </section>
       );
+    }
     case 'services': {
       const limit = getNumber(content.limit, 5);
       const services = context.services.slice(0, limit);
+      const styles = getSectionColorStyles(section, {
+        titleColor: '#1E1E1E',
+        bodyColor: '#555555',
+        linkColor: '#1E1E1E',
+      });
 
       return (
         <section key={section.id} className="bg-[#f5f5f5] px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="mb-14">
-              <h2 className="text-3xl font-bold text-[#1E1E1E] sm:text-4xl">
+              <h2 className="text-3xl font-bold sm:text-4xl" style={styles.titleStyle}>
                 {getText(content.title, 'Our Products')}
               </h2>
               <RichTextRenderer
                 content={hasRichTextContent(content.description) ? content.description : ''}
-                className="mt-3 max-w-xl text-base leading-relaxed text-[#555]"
+                className="mt-3 max-w-xl text-base leading-relaxed [&_a]:underline"
+                style={styles.bodyStyle}
+                linkColor={styles.linkColor}
               />
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -145,8 +162,8 @@ function renderSection(
                     )}
                   </div>
                   <div className="p-5">
-                    <h3 className="mb-1.5 text-sm font-bold text-[#1E1E1E]">{item.title}</h3>
-                    <p className="text-xs leading-relaxed text-[#555]">{item.excerpt ?? ''}</p>
+                    <h3 className="mb-1.5 text-sm font-bold" style={styles.titleStyle}>{item.title}</h3>
+                    <p className="text-xs leading-relaxed" style={styles.bodyStyle}>{item.excerpt ?? ''}</p>
                   </div>
                 </Link>
               ))}
@@ -158,21 +175,28 @@ function renderSection(
     case 'news': {
       const limit = getNumber(content.limit, 4);
       const posts = context.posts.slice(0, limit);
+      const styles = getSectionColorStyles(section, {
+        titleColor: '#1E1E1E',
+        bodyColor: '#555555',
+        linkColor: '#1E1E1E',
+      });
 
       return (
         <section key={section.id} className="border-t border-[#d4d4d4] bg-[#f5f5f5] px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 flex items-end justify-between gap-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#1E1E1E] sm:text-4xl">
+                <h2 className="text-3xl font-bold sm:text-4xl" style={styles.titleStyle}>
                   {getText(content.title, 'Latest News')}
                 </h2>
                 <RichTextRenderer
                   content={hasRichTextContent(content.description) ? content.description : ''}
-                  className="mt-3 text-base leading-relaxed text-[#555]"
+                  className="mt-3 text-base leading-relaxed [&_a]:underline"
+                  style={styles.bodyStyle}
+                  linkColor={styles.linkColor}
                 />
               </div>
-              <Link href="/news" className="text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:opacity-60">
+              <Link href="/news" className="text-sm font-bold transition-colors duration-200 hover:opacity-60" style={styles.titleStyle}>
                 View All &rarr;
               </Link>
             </div>
@@ -191,10 +215,10 @@ function renderSection(
                     )}
                   </div>
                   <div className="p-5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#555]">
+                    <span className="text-[11px] font-bold uppercase tracking-wider" style={styles.bodyStyle}>
                       {getPostCategoryLabel(item)}
                     </span>
-                    <h3 className="mt-1 text-sm font-bold leading-snug text-[#1E1E1E]">{item.title}</h3>
+                    <h3 className="mt-1 text-sm font-bold leading-snug" style={styles.titleStyle}>{item.title}</h3>
                   </div>
                 </Link>
               ))}
@@ -203,26 +227,37 @@ function renderSection(
         </section>
       );
     }
-    case 'cta':
+    case 'cta': {
+      const styles = getSectionColorStyles(section, {
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        linkColor: '#ffffff',
+        buttonTextColor: '#1E1E1E',
+        buttonBackgroundColor: '#ffffff',
+      });
       return (
         <section key={section.id} className="bg-[#1E1E1E] px-6 py-24">
           <div className="mx-auto max-w-7xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-white">
+            <h2 className="mb-4 text-3xl font-bold" style={styles.titleStyle}>
               {getText(content.title, 'Contact Us')}
             </h2>
             <RichTextRenderer
               content={hasRichTextContent(content.description) ? content.description : ''}
-              className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white"
+              className="mx-auto mb-8 max-w-xl text-base leading-relaxed [&_h2]:font-semibold [&_h3]:font-semibold [&_h4]:font-semibold [&_a]:underline"
+              style={styles.bodyStyle}
+              linkColor={styles.linkColor}
             />
             <Link
               href={getText(content.button_href, '/contact-us')}
-              className="inline-flex items-center gap-2 bg-white px-6 py-3 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:bg-gray-100"
+              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition-colors duration-200 hover:opacity-90"
+              style={styles.buttonStyle}
             >
               {getText(content.button_label, 'Contact Us')} &rarr;
             </Link>
           </div>
         </section>
       );
+    }
     default:
       return null;
   }

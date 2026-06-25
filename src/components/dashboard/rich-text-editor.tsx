@@ -3,9 +3,11 @@
 import { useEffect } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Color from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyle } from '@tiptap/extension-text-style';
 import {
   Bold,
   Italic,
@@ -22,6 +24,7 @@ import {
   Undo2,
   Redo2,
   Unlink,
+  Paintbrush,
 } from 'lucide-react';
 import type { RichTextDocument } from '@/types';
 import { cn } from '@/lib/utils';
@@ -48,6 +51,8 @@ export function RichTextEditor({
       StarterKit.configure({
         heading: { levels: [2, 3, 4] },
       }),
+      TextStyle,
+      Color,
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -101,6 +106,8 @@ export function RichTextEditor({
     editor.chain().focus().extendMarkRange('link').setLink({ href: url.trim() }).run();
   }
 
+  const activeTextColor = editor?.getAttributes('textStyle').color as string | undefined;
+
   const toolbarButtons = editor
     ? [
         { icon: Bold, label: 'Bold', action: () => editor.chain().focus().toggleBold().run(), active: editor.isActive('bold') },
@@ -140,8 +147,27 @@ export function RichTextEditor({
               )}
             >
               <Icon className="h-4 w-4" />
-            </button>
+              </button>
           ))}
+          {editor ? (
+            <div className="ml-auto flex items-center gap-2 rounded-sm border border-gray-200 bg-white px-2 py-1">
+              <Paintbrush className="h-4 w-4 text-gray-500" />
+              <input
+                type="color"
+                value={activeTextColor || '#1e1e1e'}
+                onChange={(event) => editor.chain().focus().setColor(event.target.value).run()}
+                title="Text Color"
+                className="h-6 w-6 cursor-pointer rounded-sm border-0 bg-transparent p-0"
+              />
+              <button
+                type="button"
+                onClick={() => editor.chain().focus().unsetColor().run()}
+                className="text-[11px] font-bold uppercase tracking-wider text-gray-500 transition-colors hover:text-gray-900"
+              >
+                Reset
+              </button>
+            </div>
+          ) : null}
         </div>
         <EditorContent editor={editor} />
       </div>
