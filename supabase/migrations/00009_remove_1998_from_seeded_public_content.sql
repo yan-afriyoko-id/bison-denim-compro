@@ -1,16 +1,16 @@
 UPDATE homepage_sections
 SET settings = jsonb_set(settings, '{eyebrow}', '"Bison Denim"'::jsonb, true)
 WHERE section_key = 'hero_slider'
-  AND settings->>'eyebrow' IN ('Sejak 1998', 'Since 1998');
+  AND settings->>'eyebrow' IN ('Sejak xxxxx', 'Since xxxxx');
 
 UPDATE page_sections
 SET content = replace(
   replace(
-    replace(content::text, 'Berdiri sejak 1998 di Bandung, kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.', 'Kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.'),
-    '"1998","label":"Tahun Berdiri"},',
+    replace(content::text, 'Berdiri sejak xxxxx di Bandung, kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.', 'Kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.'),
+    '"xxxxx","label":"Tahun Berdiri"},',
     ''
   ),
-  'Sejak 1998',
+  'Sejak xxxxx',
   'Bison Denim'
 )::jsonb
-WHERE content::text LIKE '%1998%';
+WHERE content::text LIKE '%xxxxx%';

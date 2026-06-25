@@ -13,7 +13,7 @@ export async function createService(formData: FormData) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'services', 'create')) {
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'create')) {
     return { error: 'Unauthorized' };
   }
 
@@ -63,7 +63,7 @@ export async function updateService(serviceId: string, formData: FormData) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'services', 'edit')) {
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'edit')) {
     return { error: 'Unauthorized' };
   }
 
@@ -124,7 +124,7 @@ export async function updateService(serviceId: string, formData: FormData) {
 export async function deleteService(serviceId: string) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'services', 'delete')) {
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'delete')) {
     return { error: 'Unauthorized' };
   }
   const { data: before } = await supabase.from('services').select('*').eq('id', serviceId).single();
@@ -158,7 +158,7 @@ export async function setServiceStatus(serviceId: string, status: 'draft' | 'pub
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'services', 'publish')) return { error: 'Unauthorized' };
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'publish')) return { error: 'Unauthorized' };
 
   const payload = {
     status,
@@ -184,7 +184,7 @@ export async function setServiceStatus(serviceId: string, status: 'draft' | 'pub
 export async function duplicateService(serviceId: string) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'services', 'create')) return { error: 'Unauthorized' };
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'create')) return { error: 'Unauthorized' };
 
   const { data: source, error } = await supabase.from('services').select('*').eq('id', serviceId).single();
   if (error || !source) return { error: 'Layanan tidak ditemukan' };

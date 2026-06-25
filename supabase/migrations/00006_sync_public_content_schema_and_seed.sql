@@ -70,7 +70,7 @@ BEGIN
       'Tentang Kami',
       jsonb_build_object(
         'title', 'Tentang Kami',
-        'body', E'Bison Denim adalah perusahaan fashion Indonesia yang bergerak di bidang penjualan pakaian denim, kemeja, hoodie, dan berbagai produk fashion lainnya. Berdiri sejak 1998 di Bandung, kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.\n\nDengan jaringan distribusi yang luas dan pengalaman lebih dari dua dekade, Bison Denim telah menjadi pilihan utama bagi konsumen yang mencari produk fashion denim dan non-denim yang terpercaya di Indonesia.',
+        'body', E'Bison Denim adalah perusahaan fashion Indonesia yang bergerak di bidang penjualan pakaian denim, kemeja, hoodie, dan berbagai produk fashion lainnya. Berdiri sejak xxxxx di Bandung, kami berkomitmen menghadirkan produk berkualitas dengan harga terjangkau untuk semua kalangan.\n\nDengan jaringan distribusi yang luas dan pengalaman lebih dari dua dekade, Bison Denim telah menjadi pilihan utama bagi konsumen yang mencari produk fashion denim dan non-denim yang terpercaya di Indonesia.',
         'image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
         'link_label', 'Pelajari Selengkapnya',
         'link_href', '/about/company-information'
@@ -144,18 +144,18 @@ BEGIN
   VALUES
     (company_page_id, 'hero', 'company-hero', jsonb_build_object('title', 'Tentang Bison Denim', 'image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'), '{}'::jsonb, 0, true),
     (company_page_id, 'rich_text', 'company-profile', jsonb_build_object('title', 'Profil Perusahaan', 'paragraphs', jsonb_build_array(
-      'Bison Denim adalah perusahaan fashion Indonesia yang bergerak di bidang penjualan pakaian denim, kemeja, hoodie, sweater, dan berbagai produk fashion lainnya. Didirikan pada tahun 1998 di Bandung, Jawa Barat, kami telah melayani kebutuhan fashion masyarakat Indonesia selama lebih dari dua dekade.',
+      'Bison Denim adalah perusahaan fashion Indonesia yang bergerak di bidang penjualan pakaian denim, kemeja, hoodie, sweater, dan berbagai produk fashion lainnya. Didirikan pada tahun xxxxx di Bandung, Jawa Barat, kami telah melayani kebutuhan fashion masyarakat Indonesia selama lebih dari dua dekade.',
       'Sebagai perusahaan yang berfokus pada kualitas dan kepuasan pelanggan, Bison Denim terus berinovasi dalam menghadirkan produk-produk fashion terbaru yang mengikuti tren global namun tetap terjangkau bagi semua kalangan.',
       'Dengan jaringan distribusi yang luas, produk Bison Denim tersedia di berbagai kota di Indonesia. Kami berkomitmen untuk terus menjadi pilihan utama masyarakat dalam memenuhi kebutuhan fashion sehari-hari.'
     ), 'image', 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1200&q=80', 'image_alt', 'Toko dan display produk Bison Denim'), '{}'::jsonb, 1, true),
     (company_page_id, 'stats', 'company-stats', jsonb_build_object('items', jsonb_build_array(
-      jsonb_build_object('value', '1998', 'label', 'Tahun Berdiri'),
+      jsonb_build_object('value', 'xxxxx', 'label', 'Tahun Berdiri'),
       jsonb_build_object('value', '50+', 'label', 'Kota Tersebar'),
       jsonb_build_object('value', '100+', 'label', 'Produk Tersedia')
     )), '{}'::jsonb, 2, true),
     (company_page_id, 'rich_text', 'company-values', jsonb_build_object('title', 'Nilai Kami', 'items', jsonb_build_array(
       jsonb_build_object('title', 'Kualitas', 'description', 'Produk berkualitas tinggi dengan bahan terbaik untuk kepuasan pelanggan.'),
-      jsonb_build_object('title', 'Kepercayaan', 'description', 'Melayani dengan jujur dan transparan sejak 1998.'),
+      jsonb_build_object('title', 'Kepercayaan', 'description', 'Melayani dengan jujur dan transparan sejak xxxxx.'),
       jsonb_build_object('title', 'Inovasi', 'description', 'Terus berinovasi mengikuti tren fashion terkini.')
     )), '{}'::jsonb, 3, true),
     (company_page_id, 'cta', 'company-cta', jsonb_build_object('title', 'Hubungi Kami', 'description', 'Untuk informasi lebih lanjut tentang produk Bison Denim, jangan ragu untuk menghubungi kami.', 'button_label', 'Hubungi Kami', 'button_href', '/contact-us'), '{}'::jsonb, 4, true);
@@ -216,7 +216,7 @@ BEGIN
         0,
         true,
         jsonb_build_object(
-          'eyebrow', 'Sejak 1998',
+          'eyebrow', 'Sejak xxxxx',
           'title', 'BISON DENIM',
           'description', 'Penyedia pakaian denim, kemeja, hoodie, dan produk fashion berkualitas.',
           'image', 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1920&q=80',

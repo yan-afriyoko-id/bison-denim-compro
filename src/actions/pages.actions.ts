@@ -405,7 +405,7 @@ export async function upsertPageNavigation(
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'navigation', 'manage')) {
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'edit')) {
     return { error: 'Unauthorized' };
   }
 

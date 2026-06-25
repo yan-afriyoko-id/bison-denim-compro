@@ -39,7 +39,7 @@ export async function createNavigationItem(input: NavigationPayload) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'navigation', 'manage')) {
+  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'pages', 'edit')) {
     return { error: 'Unauthorized' };
   }
 
@@ -66,7 +66,7 @@ export async function updateNavigationItem(itemId: string, input: NavigationPayl
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'navigation', 'manage')) {
+  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'pages', 'edit')) {
     return { error: 'Unauthorized' };
   }
 
@@ -95,7 +95,7 @@ export async function deleteNavigationItem(itemId: string) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'navigation', 'manage')) {
+  if (!hasMinimumRole(profile, 'editor') || !hasDashboardModuleActionAccess(profile, 'pages', 'edit')) {
     return { error: 'Unauthorized' };
   }
 
