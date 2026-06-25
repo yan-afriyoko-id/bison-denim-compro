@@ -780,26 +780,24 @@ export async function getNavigationTree(location: NavigationItem['location'] = '
     const rootByHref = new Map(baseItems.map((item) => [item.href, item]));
     const childItems = items.filter((item) => item.parent_id !== null && item.is_visible && isPubliclyVisibleItem(item));
 
-    const normalizedRoots = PUBLIC_HEADER_NAV
-      .map((item) => {
-        const existingRoot = rootByHref.get(item.href);
-        if (!existingRoot && items.length > 0) {
-          return null;
-        }
+    const normalizedRoots: NavigationItem[] = PUBLIC_HEADER_NAV.flatMap((item) => {
+      const existingRoot = rootByHref.get(item.href);
+      if (!existingRoot && items.length > 0) {
+        return [];
+      }
 
-        return {
-          id: existingRoot?.id ?? `public-header-${item.sort_order}`,
-          location: 'header' as const,
-          label: item.label,
-          href: item.href,
-          parent_id: null,
-          sort_order: item.sort_order,
-          is_visible: true,
-          open_new_tab: false,
-          locale: existingRoot?.locale ?? 'id',
-        } satisfies NavigationItem;
-      })
-      .filter((item): item is NavigationItem => item !== null);
+      return [{
+        id: existingRoot?.id ?? `public-header-${item.sort_order}`,
+        location: 'header',
+        label: item.label,
+        href: item.href,
+        parent_id: null,
+        sort_order: item.sort_order,
+        is_visible: true,
+        open_new_tab: false,
+        locale: existingRoot?.locale ?? 'id',
+      }];
+    });
 
     const normalizedChildren = childItems
       .filter((item) => normalizedRoots.some((root) => root.id === item.parent_id))

@@ -419,6 +419,10 @@ export default function PageBuilderPage() {
   }
 
   async function handleDeleteSection(sectionId: string) {
+    if (!pageId) {
+      return;
+    }
+
     const result = await deleteSection(sectionId, pageId);
     if (result.error) {
       toast.error(result.error);
@@ -1519,12 +1523,12 @@ function SectionContentPreview({
     );
   }
 
-  if (section.section_type === 'services' || section.section_type === 'news' || section.section_type === 'cta' || section.section_type === 'contact') {
+  if (section.section_type === 'cta' || section.section_type === 'contact') {
     return (
       <div className="space-y-3 text-sm text-gray-600">
         {typeof content.title === 'string' && content.title ? <h5 className="text-lg font-bold text-gray-900">{content.title}</h5> : null}
         <RichTextRenderer
-          content={section.section_type === 'contact' || section.section_type === 'cta' || section.section_type === 'services' || section.section_type === 'news' ? content.description : ''}
+          content={content.description}
           className="text-sm leading-relaxed text-gray-600"
         />
       </div>

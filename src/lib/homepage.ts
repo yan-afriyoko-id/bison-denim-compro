@@ -26,7 +26,6 @@ export async function fetchHeroSlides() {
     id: item.id,
     sort_order: item.sort_order,
     is_visible: item.is_visible,
-    created_at: item.created_at,
     ...(item.settings as HeroSlideData),
   }));
 

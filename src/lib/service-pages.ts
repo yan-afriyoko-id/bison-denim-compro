@@ -1,6 +1,14 @@
 import { createServerSupabase } from '@/lib/supabase/server';
 import type { NavigationItem, Service } from '@/types';
 
+type ServicePageRow = {
+  id: string;
+  title: string;
+  slug: string;
+  status: Service['status'];
+  published_at: string | null;
+};
+
 function getServiceContent(service: Service) {
   return (service.content ?? {}) as Record<string, unknown>;
 }
@@ -28,7 +36,15 @@ function buildLegacyServiceSections(service: Service, pageId: string) {
   const ctaLabel = getServiceText(content.cta_label);
   const ctaHref = getServiceText(content.cta_href);
 
-  const sections = [
+  const sections: Array<{
+    page_id: string;
+    section_type: 'hero' | 'rich_text' | 'cta';
+    internal_name: string;
+    content: Record<string, unknown>;
+    settings: Record<string, unknown>;
+    sort_order: number;
+    is_visible: boolean;
+  }> = [
     {
       page_id: pageId,
       section_type: 'hero',
@@ -131,7 +147,9 @@ export async function syncLegacyServicesToPages() {
     return { createdPages: 0, syncedItems: 0 };
   }
 
-  const pageBySlug = new Map(((pages ?? []) as Array<{ id: string; title: string; slug: string; status: Service['status']; published_at: string | null }>).map((page) => [page.slug, page]));
+  const pageBySlug = new Map<string, ServicePageRow>(
+    ((pages ?? []) as ServicePageRow[]).map((page) => [page.slug, page])
+  );
   const headerItems = (navItems ?? []) as NavigationItem[];
   const servicesRoot = await ensureServicesNavigationRoot(headerItems);
   const nextNavItems = [...headerItems, ...(headerItems.some((item) => item.id === servicesRoot.id) ? [] : [servicesRoot])];
@@ -140,7 +158,7 @@ export async function syncLegacyServicesToPages() {
   let syncedItems = 0;
 
   for (const service of legacyServices) {
-    let page = pageBySlug.get(service.slug);
+    let page: ServicePageRow | undefined = pageBySlug.get(service.slug);
 
     if (!page) {
       const { data: createdPage, error: pageError } = await supabase
@@ -172,9 +190,13 @@ export async function syncLegacyServicesToPages() {
         continue;
       }
 
-      page = createdPage as typeof page;
+      page = createdPage as ServicePageRow;
       pageBySlug.set(service.slug, page);
       createdPages += 1;
+    }
+
+    if (!page) {
+      continue;
     }
 
     const href = `/services/${service.slug}`;
