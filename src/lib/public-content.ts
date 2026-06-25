@@ -737,61 +737,82 @@ export async function getNavigationTree(location: NavigationItem['location'] = '
 
   const items = ((data ?? []) as NavigationItem[]);
 
+  const pageCandidates = items
+    .filter((item) => item.href.startsWith('/') && item.href !== '/')
+    .flatMap((item) => {
+      const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
+      const slugTail = normalizedHref.split('/').pop() ?? normalizedHref;
+
+      return Array.from(new Set([normalizedHref, slugTail])).filter(Boolean);
+    })
+    .filter((slug): slug is string => Boolean(slug));
+
+  const { data: pages } = pageCandidates.length > 0
+    ? await supabase.from('pages').select('slug, status').in('slug', Array.from(new Set(pageCandidates)))
+    : { data: [] };
+
+  const publishedSlugs = new Set(
+    ((pages ?? []) as Array<{ slug: string; status: Page['status'] }>)
+      .filter((page) => page.status === 'published')
+      .map((page) => page.slug)
+  );
+
+  const isPubliclyVisibleItem = (item: NavigationItem) => {
+    if (location === 'header' && PUBLIC_HEADER_NAV.some((navItem) => navItem.href === item.href)) {
+      return true;
+    }
+
+    if (!item.href.startsWith('/') || item.href === '/') {
+      return true;
+    }
+
+    const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
+    const slugTail = normalizedHref.split('/').pop();
+
+    return publishedSlugs.has(normalizedHref) || (!!slugTail && publishedSlugs.has(slugTail));
+  };
+
   if (location === 'header') {
     const baseItems = items.length > 0
       ? items.filter((item) => item.parent_id === null && item.is_visible)
       : FALLBACK_NAV_ITEMS;
 
-    const visibleRootHrefs = new Set(baseItems.map((item) => item.href));
-    const canonicalItems = PUBLIC_HEADER_NAV
-      .filter((item) => visibleRootHrefs.has(item.href) || items.length === 0)
+    const rootByHref = new Map(baseItems.map((item) => [item.href, item]));
+    const childItems = items.filter((item) => item.parent_id !== null && item.is_visible && isPubliclyVisibleItem(item));
+
+    const normalizedRoots = PUBLIC_HEADER_NAV
+      .map((item) => {
+        const existingRoot = rootByHref.get(item.href);
+        if (!existingRoot && items.length > 0) {
+          return null;
+        }
+
+        return {
+          id: existingRoot?.id ?? `public-header-${item.sort_order}`,
+          location: 'header' as const,
+          label: item.label,
+          href: item.href,
+          parent_id: null,
+          sort_order: item.sort_order,
+          is_visible: true,
+          open_new_tab: false,
+          locale: existingRoot?.locale ?? 'id',
+        } satisfies NavigationItem;
+      })
+      .filter((item): item is NavigationItem => item !== null);
+
+    const normalizedChildren = childItems
+      .filter((item) => normalizedRoots.some((root) => root.id === item.parent_id))
       .map((item) => ({
-        id: `public-header-${item.sort_order}`,
-        location: 'header' as const,
-        label: item.label,
-        href: item.href,
-        parent_id: null,
-        sort_order: item.sort_order,
-        is_visible: true,
-        open_new_tab: false,
-        locale: 'id',
-        children: [],
+        ...item,
+        label: item.label.trim(),
       }));
 
-    return canonicalItems;
+    return buildNavigationTree([...normalizedRoots, ...normalizedChildren]);
   }
 
   if (items.length > 0) {
-    const pageCandidates = items
-      .filter((item) => item.href.startsWith('/') && item.href !== '/')
-      .flatMap((item) => {
-        const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
-        const slugTail = normalizedHref.split('/').pop() ?? normalizedHref;
-
-        return Array.from(new Set([normalizedHref, slugTail])).filter(Boolean);
-      })
-      .filter((slug): slug is string => Boolean(slug));
-
-    const { data: pages } = pageCandidates.length > 0
-      ? await supabase.from('pages').select('slug, status').in('slug', Array.from(new Set(pageCandidates)))
-      : { data: [] };
-
-    const publishedSlugs = new Set(
-      ((pages ?? []) as Array<{ slug: string; status: Page['status'] }> )
-        .filter((page) => page.status === 'published')
-        .map((page) => page.slug)
-    );
-
-    const visibleItems = items.filter((item) => {
-      if (!item.href.startsWith('/') || item.href === '/') {
-        return true;
-      }
-
-      const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
-      const slugTail = normalizedHref.split('/').pop();
-
-      return publishedSlugs.has(normalizedHref) || (!!slugTail && publishedSlugs.has(slugTail));
-    });
+    const visibleItems = items.filter((item) => isPubliclyVisibleItem(item));
 
     return buildNavigationTree(visibleItems);
   }
