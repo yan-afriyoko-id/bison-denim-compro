@@ -180,15 +180,7 @@ export function normalizeDashboardPermissions(
       ? (value.module_actions as Record<string, unknown>)
       : {};
 
-  return {
-    modules: dashboardModuleKeys.reduce<Record<DashboardModuleKey, boolean>>((acc, moduleKey) => {
-      acc[moduleKey] =
-        typeof modulesValue[moduleKey] === 'boolean'
-          ? (modulesValue[moduleKey] as boolean)
-          : defaults.modules[moduleKey];
-      return acc;
-    }, {} as Record<DashboardModuleKey, boolean>),
-    module_actions: dashboardModuleKeys.reduce<PermissionDraft>((acc, moduleKey) => {
+  const moduleActions = dashboardModuleKeys.reduce<PermissionDraft>((acc, moduleKey) => {
       const rawModuleActions =
         moduleActionsValue[moduleKey] &&
         typeof moduleActionsValue[moduleKey] === 'object' &&
@@ -208,6 +200,35 @@ export function normalizeDashboardPermissions(
       );
 
       return acc;
+    }, {} as PermissionDraft);
+
+  const modules = dashboardModuleKeys.reduce<Record<DashboardModuleKey, boolean>>((acc, moduleKey) => {
+    const explicitModuleValue =
+      typeof modulesValue[moduleKey] === 'boolean'
+        ? (modulesValue[moduleKey] as boolean)
+        : defaults.modules[moduleKey];
+    const hasAnyActionEnabled = dashboardModuleActionsByModule[moduleKey].some(
+      ({ key }) => moduleActions[moduleKey]?.[key] === true
+    );
+
+    acc[moduleKey] = explicitModuleValue && (moduleKey === 'overview' || hasAnyActionEnabled);
+    return acc;
+  }, {} as Record<DashboardModuleKey, boolean>);
+
+  return {
+    modules,
+    module_actions: dashboardModuleKeys.reduce<PermissionDraft>((acc, moduleKey) => {
+      acc[moduleKey] = modules[moduleKey]
+        ? moduleActions[moduleKey]
+        : dashboardModuleActionsByModule[moduleKey].reduce<Partial<Record<DashboardModuleAction, boolean>>>(
+            (actionAcc, action) => {
+              actionAcc[action.key] = false;
+              return actionAcc;
+            },
+            {}
+          );
+
+      return acc;
     }, {} as PermissionDraft),
   };
 }
@@ -216,7 +237,7 @@ export function getDashboardPermissions(
   profile: Pick<Profile, 'role' | 'is_active' | 'dashboard_permissions'> | null | undefined
 ): DashboardPermissionSet {
   if (!profile) {
-    return getDefaultDashboardPermissions('viewer');
+    return getDefaultDashboardPermissions('editor');
   }
 
   return normalizeDashboardPermissions(profile.role, profile.dashboard_permissions);

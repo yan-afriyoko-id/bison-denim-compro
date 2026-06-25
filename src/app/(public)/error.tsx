@@ -11,11 +11,11 @@ export default function ErrorPage({
   return (
     <section className="py-32 px-6 text-center">
       <div className="mx-auto max-w-xl">
-        <h1 className="text-5xl font-bold text-black mb-4">Terjadi Kesalahan</h1>
+        <h1 className="text-5xl font-bold text-[#1E1E1E] mb-4">Terjadi Kesalahan</h1>
         <p className="text-lg text-[#555] mb-8">Maaf, terjadi kesalahan. Silakan coba lagi.</p>
         <div className="flex items-center justify-center gap-4">
-          <button onClick={reset} className="bg-black text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200">Coba Lagi</button>
-          <Link href="/" className="border border-black text-black font-bold text-sm px-8 py-3 hover:bg-black hover:text-white transition-colors duration-200">Kembali ke Beranda</Link>
+          <button onClick={reset} className="bg-[#1E1E1E] text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200">Coba Lagi</button>
+          <Link href="/" className="border border-[#1E1E1E] text-[#1E1E1E] font-bold text-sm px-8 py-3 hover:bg-[#1E1E1E] hover:text-white transition-colors duration-200">Kembali ke Beranda</Link>
         </div>
       </div>
     </section>

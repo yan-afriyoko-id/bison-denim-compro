@@ -69,13 +69,15 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
     return (
       <section className="py-24 px-6 text-center">
         <div className="mx-auto max-w-xl">
-          <h1 className="text-3xl font-bold text-black mb-4">Pesan Terkirim</h1>
+          <h1 className="text-3xl font-bold text-[#1E1E1E] mb-4">Pesan Terkirim</h1>
           <p className="text-[#555] text-base leading-relaxed mb-8">
-            Terima kasih telah menghubungi {contactInfo.siteName}. Tim kami akan merespon pesan Anda dalam 1x24 jam.
+            {contactInfo.siteName
+              ? `Terima kasih telah menghubungi ${contactInfo.siteName}. Tim kami akan merespon pesan Anda dalam 1x24 jam.`
+              : 'Terima kasih telah menghubungi kami. Tim kami akan merespon pesan Anda dalam 1x24 jam.'}
           </p>
           <button
             onClick={() => setSubmitted(false)}
-            className="bg-black text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200"
+            className="bg-[#1E1E1E] text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200"
           >
             Kirim Pesan Lagi
           </button>
@@ -88,10 +90,10 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
     <>
       <section className="py-24 px-6 border-b border-[#d4d4d4]">
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-black mb-4">Hubungi Kami</h1>
-          <p className="text-[#555] text-lg max-w-2xl mx-auto leading-relaxed">
-            {contactInfo.description || `Silakan hubungi tim ${contactInfo.siteName} untuk informasi lebih lanjut.`}
-          </p>
+          <h1 className="text-4xl sm:text-5xl font-bold text-[#1E1E1E] mb-4">Hubungi Kami</h1>
+          {contactInfo.description ? (
+            <p className="text-[#555] text-lg max-w-2xl mx-auto leading-relaxed">{contactInfo.description}</p>
+          ) : null}
         </div>
       </section>
 
@@ -102,27 +104,27 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-bold text-black mb-1.5">Nama</label>
-                    <input type="text" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none" required />
+                    <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Nama</label>
+                    <input type="text" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-black mb-1.5">Email</label>
-                    <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none" required />
+                    <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Email</label>
+                    <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none" required />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-bold text-black mb-1.5">Perusahaan</label>
-                    <input type="text" value={form.perusahaan} onChange={(e) => setForm({ ...form, perusahaan: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none" />
+                    <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Perusahaan</label>
+                    <input type="text" value={form.perusahaan} onChange={(e) => setForm({ ...form, perusahaan: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-black mb-1.5">Telepon</label>
-                    <input type="tel" value={form.telepon} onChange={(e) => setForm({ ...form, telepon: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none" />
+                    <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Telepon</label>
+                    <input type="tel" value={form.telepon} onChange={(e) => setForm({ ...form, telepon: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-black mb-1.5">Subjek</label>
-                  <select value={form.subjek} onChange={(e) => setForm({ ...form, subjek: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none bg-white" required>
+                  <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Subjek</label>
+                  <select value={form.subjek} onChange={(e) => setForm({ ...form, subjek: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none bg-white" required>
                     <option value="">Pilih subjek</option>
                     <option value="Informasi Produk">Informasi Produk</option>
                     <option value="Pemesanan">Pemesanan</option>
@@ -132,8 +134,8 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-black mb-1.5">Negara</label>
-                  <select value={form.negara} onChange={(e) => setForm({ ...form, negara: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none bg-white">
+                  <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Negara</label>
+                  <select value={form.negara} onChange={(e) => setForm({ ...form, negara: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none bg-white">
                     <option>Indonesia</option>
                     <option>Malaysia</option>
                     <option>Singapura</option>
@@ -142,14 +144,16 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-black mb-1.5">Pesan</label>
-                  <textarea rows={5} value={form.pesan} onChange={(e) => setForm({ ...form, pesan: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none resize-none" required />
+                  <label className="block text-sm font-bold text-[#1E1E1E] mb-1.5">Pesan</label>
+                  <textarea rows={5} value={form.pesan} onChange={(e) => setForm({ ...form, pesan: e.target.value })} className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none resize-none" required />
                 </div>
                 <div className="flex items-start gap-3">
                   <input type="checkbox" checked={form.setuju} onChange={(e) => setForm({ ...form, setuju: e.target.checked })} className="mt-1" required />
-                  <label className="text-sm text-[#555]">Saya setuju dengan kebijakan privasi {contactInfo.siteName}.</label>
+                  <label className="text-sm text-[#555]">
+                    Saya setuju dengan kebijakan privasi {contactInfo.siteName || 'kami'}.
+                  </label>
                 </div>
-                <button type="submit" disabled={isPending} className="bg-black text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200 disabled:opacity-60">
+                <button type="submit" disabled={isPending} className="bg-[#1E1E1E] text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200 disabled:opacity-60">
                   {isPending ? 'Mengirim...' : 'Kirim Pesan'}
                 </button>
               </form>
@@ -158,24 +162,30 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
             <div>
               <div className="border border-[#d4d4d4] p-6 space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-black mb-2">Kantor Pusat</h3>
-                  <p className="text-sm text-[#555] leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
+                  <h3 className="text-sm font-bold text-[#1E1E1E] mb-2">Kantor Pusat</h3>
+                  {contactInfo.address ? (
+                    <p className="text-sm text-[#555] leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
+                  ) : null}
                 </div>
+                {contactInfo.phone ? (
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1E1E1E] mb-2">Telepon</h3>
+                    <a href={`tel:${contactInfo.phone}`} className="text-sm text-[#555] hover:text-[#1E1E1E]">{contactInfo.phone}</a>
+                  </div>
+                ) : null}
+                {contactInfo.email ? (
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1E1E1E] mb-2">Email</h3>
+                    <a href={`mailto:${contactInfo.email}`} className="text-sm text-[#555] hover:text-[#1E1E1E]">{contactInfo.email}</a>
+                  </div>
+                ) : null}
                 <div>
-                  <h3 className="text-sm font-bold text-black mb-2">Telepon</h3>
-                  <a href={`tel:${contactInfo.phone}`} className="text-sm text-[#555] hover:text-black">{contactInfo.phone}</a>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-black mb-2">Email</h3>
-                  <a href={`mailto:${contactInfo.email}`} className="text-sm text-[#555] hover:text-black">{contactInfo.email}</a>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-black mb-2">Jam Operasional</h3>
+                  <h3 className="text-sm font-bold text-[#1E1E1E] mb-2">Jam Operasional</h3>
                   <p className="text-sm text-[#555] leading-relaxed">Senin - Jumat: 08.00 - 17.00<br />Sabtu: 08.00 - 14.00</p>
                 </div>
               </div>
               <div className="mt-6 border border-[#d4d4d4] overflow-hidden">
-                <svg viewBox="0 0 400 200" className="block w-full h-[200px]" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Peta lokasi kantor ${contactInfo.siteName}`}>
+                <svg viewBox="0 0 400 200" className="block w-full h-[200px]" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Peta lokasi kantor ${contactInfo.siteName || 'kami'}`}>
                   <rect width="400" height="200" fill="#e8eaed" />
                   <rect x="10" y="10" width="90" height="60" fill="#dfe6e9" />
                   <rect x="20" y="90" width="70" height="50" fill="#dfe6e9" />
@@ -199,8 +209,10 @@ export function ContactPageClient({ contactInfo }: ContactPageProps) {
                   </g>
                 </svg>
                 <div className="bg-white px-4 py-3 border-t border-[#d4d4d4]">
-                  <p className="text-sm font-bold text-black">{contactInfo.siteName}</p>
-                  <p className="text-xs text-[#555] leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
+                  {contactInfo.siteName ? <p className="text-sm font-bold text-[#1E1E1E]">{contactInfo.siteName}</p> : null}
+                  {contactInfo.address ? (
+                    <p className="text-xs text-[#555] leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
+                  ) : null}
                 </div>
               </div>
             </div>

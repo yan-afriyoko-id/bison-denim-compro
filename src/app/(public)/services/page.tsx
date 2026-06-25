@@ -12,7 +12,7 @@ export default async function ServicesPage() {
     <>
       <section className="border-b border-[#d4d4d4] px-6 py-24">
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="mb-4 text-4xl font-bold text-black sm:text-5xl">Produk Kami</h1>
+          <h1 className="mb-4 text-4xl font-bold text-[#1E1E1E] sm:text-5xl">Produk Kami</h1>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#555]">
             Berbagai pilihan produk fashion berkualitas untuk memenuhi kebutuhan Anda.
           </p>
@@ -31,7 +31,7 @@ export default async function ServicesPage() {
                 <Link
                   key={item.id}
                   href={`/services/${item.slug}`}
-                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-[#1E1E1E]"
                 >
                   <div className="relative aspect-[4/3] bg-[#f5f5f5]">
                     {item.cover_image_url ? (
@@ -41,7 +41,7 @@ export default async function ServicesPage() {
                     )}
                   </div>
                   <div className="p-5">
-                    <h3 className="mb-1.5 text-sm font-bold text-black">{item.title}</h3>
+                    <h3 className="mb-1.5 text-sm font-bold text-[#1E1E1E]">{item.title}</h3>
                     <p className="text-xs leading-relaxed text-[#555]">{item.excerpt ?? ''}</p>
                   </div>
                 </Link>
@@ -51,15 +51,15 @@ export default async function ServicesPage() {
         </div>
       </section>
 
-      <section className="bg-black px-6 py-24">
+      <section className="bg-[#1E1E1E] px-6 py-24">
         <div className="mx-auto max-w-7xl text-center">
           <h2 className="mb-4 text-3xl font-bold text-white">Hubungi Kami</h2>
-          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/70">
-            Tertarik dengan produk kami? Hubungi tim {grouped.brand.site_name || 'Bison Denim'} untuk informasi lebih lanjut.
+          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white">
+            Tertarik dengan produk kami? Hubungi tim {grouped.brand.site_name || 'kami'} untuk informasi lebih lanjut.
           </p>
           <Link
             href="/contact-us"
-            className="inline-block bg-white px-8 py-3 text-sm font-bold text-black transition-colors duration-200 hover:bg-gray-100"
+            className="inline-block bg-white px-8 py-3 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:bg-gray-100"
           >
             {grouped.contact.contact_email ? 'Hubungi Tim Kami' : 'Hubungi Kami'}
           </Link>

@@ -57,7 +57,7 @@ export function HeroSlider({ slides, interval = 6000, className = '' }: HeroSlid
 
   return (
     <section
-      className={`relative h-[520px] bg-black overflow-hidden ${className}`}
+      className={`relative h-[520px] bg-[#1E1E1E] overflow-hidden ${className}`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
@@ -110,7 +110,7 @@ export function HeroSlider({ slides, interval = 6000, className = '' }: HeroSlid
               {slide.cta && (
                 <Link
                   href={slide.cta.href}
-                  className={`inline-flex items-center gap-2 mt-8 bg-white text-black font-bold text-sm px-6 py-3 hover:bg-gray-100 transition-all duration-300 ${
+                  className={`inline-flex items-center gap-2 mt-8 bg-white text-[#1E1E1E] font-bold text-sm px-6 py-3 hover:bg-gray-100 transition-all duration-300 ${
                     i === current ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-4 opacity-0'
                   }`}
                 >
@@ -130,7 +130,7 @@ export function HeroSlider({ slides, interval = 6000, className = '' }: HeroSlid
             type="button"
             onClick={prev}
             aria-label="Slide sebelumnya"
-            className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-10 h-10 sm:w-12 sm:h-12 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white hover:text-black border border-white/30 transition-colors duration-200 cursor-pointer"
+            className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-10 h-10 sm:w-12 sm:h-12 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white hover:text-[#1E1E1E] border border-white/30 transition-colors duration-200 cursor-pointer"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
@@ -140,7 +140,7 @@ export function HeroSlider({ slides, interval = 6000, className = '' }: HeroSlid
             type="button"
             onClick={next}
             aria-label="Slide berikutnya"
-            className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-10 h-10 sm:w-12 sm:h-12 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white hover:text-black border border-white/30 transition-colors duration-200 cursor-pointer"
+            className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-10 h-10 sm:w-12 sm:h-12 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white hover:text-[#1E1E1E] border border-white/30 transition-colors duration-200 cursor-pointer"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18l6-6-6-6" />

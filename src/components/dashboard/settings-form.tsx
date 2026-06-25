@@ -145,9 +145,8 @@ export function SettingsForm({
                 label="Logo"
                 defaultValue={settings.brand.logo}
                 onChange={updateLogo}
-                aspectClass="aspect-[3/1]"
-                wrapperClassName="w-[220px]"
-                hint="This logo is used across the header, footer, and public pages"
+                aspectClass="aspect-square"
+                wrapperClassName="w-28"
               />
               <VisibilityToggle label="Site Name Public" checked={visibility.site_name ?? true} onChange={() => toggleVisibility('site_name')} />
               <VisibilityToggle label="Logo Public" checked={visibility.logo ?? true} onChange={() => toggleVisibility('logo')} />
@@ -217,7 +216,7 @@ function SectionCard({
           type="button"
           onClick={onSave}
           disabled={saving}
-          className="inline-flex items-center justify-center rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E] disabled:opacity-50"
         >
           {saving ? 'Saving...' : `Save ${title}`}
         </button>

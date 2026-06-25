@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Search, ChevronDown, Globe, Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { SearchOverlay } from './search-overlay';
 import { createClient } from '@/lib/supabase/client';
 import type { PublicNavItem } from '@/lib/public-content';
+import { LogoutButton } from '@/components/shared/logout-button';
 
 const SOURCE_LANGUAGE = 'id';
 const GOOGLE_TRANSLATE_COOKIE = 'googtrans';
@@ -165,10 +165,9 @@ export function Header({
 }: {
   navigation: PublicNavItem[];
   siteName: string;
-  logoUrl: string;
+  logoUrl?: string;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -267,61 +266,27 @@ export function Header({
 
   return (
     <>
-      <Script
-        id="google-translate-default-locale"
-        strategy="beforeInteractive"
-      >{`
-        (function () {
-          var preferredKey = '${PREFERRED_LOCALE_KEY}';
-          var cookieName = '${GOOGLE_TRANSLATE_COOKIE}';
-          var defaultLocale = '${DEFAULT_LOCALE}';
-          var defaultCookie = '/${SOURCE_LANGUAGE}/${localeOptions.en.googleCode}';
-          var hasPreferredLocale = false;
-          var hasTranslateCookie = false;
-
-          try {
-            hasPreferredLocale = !!window.localStorage.getItem(preferredKey);
-          } catch (error) {}
-
-          hasTranslateCookie = document.cookie.split('; ').some(function (row) {
-            return row.indexOf(cookieName + '=') === 0;
-          });
-
-          if (!hasPreferredLocale) {
-            try {
-              window.localStorage.setItem(preferredKey, defaultLocale);
-            } catch (error) {}
-          }
-
-          if (!hasTranslateCookie) {
-            document.cookie = cookieName + '=' + encodeURIComponent(defaultCookie) + '; path=/; max-age=31536000';
-          }
-        })();
-      `}</Script>
-      <Script
-        id="google-translate-script"
-        src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-        strategy="afterInteractive"
-      />
-      <div id="google_translate_element" className="sr-only" aria-hidden="true" />
-
       <header className="sticky top-0 z-50 border-b border-[#d4d4d4] bg-white/95 backdrop-blur-md transition-[background-color,box-shadow] duration-300 ease-out">
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-6">
           <Link href="/" className="navbar-interactive flex items-center gap-3 flex-shrink-0 rounded-sm">
-            <div className="relative h-10 w-10 overflow-hidden">
-              <Image
-                src={logoUrl}
-                alt={`${siteName} logo`}
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-black tracking-tight uppercase">
-                {siteName}
+            {logoUrl ? (
+              <div className="relative h-10 w-10 overflow-hidden">
+                <Image
+                  src={logoUrl}
+                  alt={siteName ? `${siteName} logo` : 'Site logo'}
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </div>
-            </div>
+            ) : null}
+            {siteName ? (
+              <div>
+                <div className="text-sm font-bold text-[#1E1E1E] tracking-tight uppercase">
+                  {siteName}
+                </div>
+              </div>
+            ) : null}
           </Link>
 
           <nav className="hidden md:flex items-center h-full">
@@ -346,8 +311,8 @@ export function Header({
                     className={cn(
                       'navbar-interactive flex h-full items-center gap-1 px-4 text-sm font-semibold tracking-tight border-b-2 border-transparent transition-[color,border-color] duration-300 ease-out',
                       isActive(link.href)
-                        ? 'text-black border-black'
-                        : 'text-[#555] hover:text-black hover:border-[#d4d4d4]'
+                        ? 'text-[#1E1E1E] border-[#1E1E1E]'
+                        : 'text-[#555] hover:text-[#1E1E1E] hover:border-[#d4d4d4]'
                     )}
                   >
                     {link.label}
@@ -366,8 +331,8 @@ export function Header({
                           className={cn(
                             'navbar-interactive block border-l-2 border-transparent px-4 py-2.5 text-sm transition-[background-color,color,border-color] duration-300 ease-out',
                             isActive(child.href)
-                              ? 'text-black font-semibold border-black bg-[#f7f7f7]'
-                              : 'text-[#555] hover:text-black hover:bg-[#f7f7f7] hover:border-[#d4d4d4]'
+                              ? 'text-[#1E1E1E] font-semibold border-[#1E1E1E] bg-[#f7f7f7]'
+                              : 'text-[#555] hover:text-[#1E1E1E] hover:bg-[#f7f7f7] hover:border-[#d4d4d4]'
                           )}
                         >
                           {child.label}
@@ -383,7 +348,7 @@ export function Header({
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSearchOpen(true)}
-              className="navbar-interactive hidden h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black md:flex"
+              className="navbar-interactive hidden h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-[#1E1E1E] md:flex"
               aria-label="Cari"
             >
               <Search size={16} />
@@ -392,7 +357,7 @@ export function Header({
             <div className="relative hidden md:block" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="navbar-interactive flex h-9 items-center gap-1 rounded-sm px-2 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black"
+                className="navbar-interactive flex h-9 items-center gap-1 rounded-sm px-2 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-[#1E1E1E]"
                 aria-label="Bahasa"
               >
                 <Globe size={14} />
@@ -410,8 +375,8 @@ export function Header({
                       className={cn(
                         'navbar-interactive flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-[background-color,color] duration-300 ease-out',
                         activeLocale === locale
-                          ? 'bg-[#f7f7f7] font-semibold text-black'
-                          : 'text-[#555] hover:text-black hover:bg-[#f7f7f7]'
+                          ? 'bg-[#f7f7f7] font-semibold text-[#1E1E1E]'
+                          : 'text-[#555] hover:text-[#1E1E1E] hover:bg-[#f7f7f7]'
                       )}
                     >
                       <span className="text-xs">{localeOptions[locale].flag}</span>
@@ -426,7 +391,7 @@ export function Header({
               <div className="relative hidden md:block" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black"
+                  className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-[#1E1E1E]"
                   aria-label="Profile"
                 >
                   <User size={18} />
@@ -436,31 +401,27 @@ export function Header({
                     <Link
                       href="/dashboard"
                       onClick={() => setProfileOpen(false)}
-                      className="navbar-interactive flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:text-black hover:bg-[#f7f7f7]"
+                      className="navbar-interactive flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:text-[#1E1E1E] hover:bg-[#f7f7f7]"
                     >
                       <LayoutDashboard size={15} />
                       Dashboard
                     </Link>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setProfileOpen(false);
-                        const { signOut } = await import('@/actions/auth.actions');
-                        await signOut();
-                        router.push('/auth/login');
-                      }}
+                    <LogoutButton
+                      onBeforeLogout={() => setProfileOpen(false)}
                       className="navbar-interactive flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:text-red-600 hover:bg-[#f7f7f7]"
                     >
+                      <>
                       <LogOut size={15} />
                       Keluar
-                    </button>
+                      </>
+                    </LogoutButton>
                   </div>
                 )}
               </div>
             ) : (
               <Link
                 href="/auth/login"
-                className="navbar-interactive hidden h-9 items-center gap-1.5 rounded-sm border border-black bg-white px-4 text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white md:flex"
+                className="navbar-interactive hidden h-9 items-center gap-1.5 rounded-sm border border-[#1E1E1E] bg-white px-4 text-sm font-semibold text-[#1E1E1E] transition-colors duration-300 ease-out hover:bg-[#1E1E1E] hover:text-white md:flex"
               >
                 Login
               </Link>
@@ -468,7 +429,7 @@ export function Header({
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black md:hidden"
+              className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-[#1E1E1E] md:hidden"
               aria-label="Menu"
             >
               {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -479,13 +440,13 @@ export function Header({
 
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 bg-black/30 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
+          <div className="fixed inset-0 bg-[#1E1E1E]/30 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
           <div className="fixed top-0 right-0 bottom-0 w-[280px] bg-white border-l border-[#d4d4d4] z-50 md:hidden flex flex-col">
             <div className="flex items-center justify-between h-[72px] px-6 border-b border-[#d4d4d4] flex-shrink-0">
-              <span className="text-sm font-bold text-black tracking-tight uppercase">Menu</span>
+              <span className="text-sm font-bold text-[#1E1E1E] tracking-tight uppercase">Menu</span>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-black"
+                className="navbar-interactive flex h-9 w-9 items-center justify-center rounded-sm text-[#555] transition-[background-color,color] duration-300 ease-out hover:bg-[#f7f7f7] hover:text-[#1E1E1E]"
               >
                 <X size={18} />
               </button>
@@ -503,8 +464,8 @@ export function Header({
                       className={cn(
                         'navbar-interactive flex items-center border-l-2 border-transparent px-4 py-3 text-sm font-semibold transition-[background-color,color,border-color] duration-300 ease-out',
                         isActive(link.href)
-                          ? 'text-black border-black bg-[#f7f7f7]'
-                          : 'text-[#555] hover:text-black hover:bg-[#f7f7f7]'
+                          ? 'text-[#1E1E1E] border-[#1E1E1E] bg-[#f7f7f7]'
+                          : 'text-[#555] hover:text-[#1E1E1E] hover:bg-[#f7f7f7]'
                       )}
                     >
                       {link.label}
@@ -521,8 +482,8 @@ export function Header({
                             className={cn(
                               'navbar-interactive flex items-center border-l-2 border-transparent px-4 py-2.5 text-sm transition-[background-color,color,border-color] duration-300 ease-out',
                               isActive(child.href)
-                                ? 'text-black border-black bg-[#f7f7f7]'
-                                : 'text-[#555] hover:text-black hover:bg-[#f7f7f7] hover:border-[#d4d4d4]'
+                                ? 'text-[#1E1E1E] border-[#1E1E1E] bg-[#f7f7f7]'
+                                : 'text-[#555] hover:text-[#1E1E1E] hover:bg-[#f7f7f7] hover:border-[#d4d4d4]'
                             )}
                           >
                             {child.label}
@@ -540,30 +501,26 @@ export function Header({
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileOpen(false)}
-                    className="navbar-interactive flex h-10 items-center justify-center gap-2 border border-black bg-white text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white"
+                    className="navbar-interactive flex h-10 items-center justify-center gap-2 border border-[#1E1E1E] bg-white text-sm font-semibold text-[#1E1E1E] transition-colors duration-300 ease-out hover:bg-[#1E1E1E] hover:text-white"
                   >
                     <LayoutDashboard size={15} />
                     Dashboard
                   </Link>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setMobileOpen(false);
-                      const { signOut } = await import('@/actions/auth.actions');
-                      await signOut();
-                      router.push('/auth/login');
-                    }}
+                  <LogoutButton
+                    onBeforeLogout={() => setMobileOpen(false)}
                     className="navbar-interactive flex h-10 w-full items-center justify-center gap-2 border border-red-200 bg-white text-sm font-semibold text-red-600 transition-colors duration-300 ease-out hover:bg-red-50"
                   >
+                    <>
                     <LogOut size={15} />
                     Keluar
-                  </button>
+                    </>
+                  </LogoutButton>
                 </div>
               ) : (
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileOpen(false)}
-                  className="navbar-interactive mb-3 flex h-10 items-center justify-center border border-black bg-white text-sm font-semibold text-black transition-colors duration-300 ease-out hover:bg-black hover:text-white"
+                  className="navbar-interactive mb-3 flex h-10 items-center justify-center border border-[#1E1E1E] bg-white text-sm font-semibold text-[#1E1E1E] transition-colors duration-300 ease-out hover:bg-[#1E1E1E] hover:text-white"
                 >
                   Login
                 </Link>
@@ -579,8 +536,8 @@ export function Header({
                     className={cn(
                       'navbar-interactive flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm transition-[background-color,color] duration-300 ease-out',
                       activeLocale === locale
-                        ? 'bg-[#f7f7f7] font-semibold text-black'
-                        : 'text-[#555] hover:text-black hover:bg-[#f7f7f7]'
+                        ? 'bg-[#f7f7f7] font-semibold text-[#1E1E1E]'
+                        : 'text-[#555] hover:text-[#1E1E1E] hover:bg-[#f7f7f7]'
                     )}
                   >
                     <span className="text-xs">{localeOptions[locale].flag}</span>

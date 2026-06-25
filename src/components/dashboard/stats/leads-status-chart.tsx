@@ -39,7 +39,7 @@ export function LeadsStatusChart({ data }: LeadsStatusChartProps) {
               border: '1px solid #e5e7eb',
               borderRadius: '4px',
               fontSize: '12px',
-              color: '#111111',
+              color: '#1E1E1E',
               boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
             cursor={{ fill: '#f3f4f6' }}

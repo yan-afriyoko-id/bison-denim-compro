@@ -8,6 +8,9 @@ import { clampPage, parsePageValue, parsePerPageValue } from '@/lib/pagination';
 import { requireDashboardModuleAccess } from '@/lib/auth/helpers';
 import { ToolbarFilters } from '@/components/dashboard/toolbar-filters';
 import { ActionButton } from '@/components/dashboard/action-button';
+import { resolvePagePublicPath } from '@/lib/page-public-path';
+import type { NavigationItem } from '@/types';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 async function getPages(searchParams?: Record<string, string | string[] | undefined>) {
   const supabase = await createServerSupabase();
@@ -31,10 +34,18 @@ async function getPages(searchParams?: Record<string, string | string[] | undefi
   const page = clampPage(requestedPage, totalPages);
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
-  const { data } = await query.range(from, to);
+  const [{ data }, { data: navItems }] = await Promise.all([
+    query.range(from, to),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
+
+  const items = (data ?? []).map((page) => ({
+    ...page,
+    public_href: resolvePagePublicPath(page, (navItems ?? []) as NavigationItem[]),
+  }));
 
   return {
-    items: data ?? [],
+    items,
     page,
     perPage,
     totalItems,
@@ -90,7 +101,7 @@ export default async function PagesPage({
             />
             <Link
               href="/dashboard/pages/builder"
-              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
             >
               <Plus className="h-4 w-4" />
               New Page
@@ -128,14 +139,14 @@ export default async function PagesPage({
 }
 
 function PageRow({ page }: { page: Awaited<ReturnType<typeof getPages>>['items'][number] }) {
-  const publicHref = page.page_key === 'home' || page.slug === 'home' ? '/' : `/${page.slug}`;
-  const publicLabel = page.page_key === 'home' || page.slug === 'home' ? '/' : `/${page.slug}`;
+  const publicHref = page.public_href;
+  const publicLabel = page.public_href;
 
   return (
     <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <Link href={`/dashboard/pages/builder?id=${page.id}`} className="text-sm font-bold text-gray-900 hover:text-black transition-colors">
+          <Link href={`/dashboard/pages/builder?id=${page.id}`} className="text-sm font-bold text-gray-900 hover:text-[#1E1E1E] transition-colors">
             {page.title}
           </Link>
           <span className={`inline-block rounded-sm border px-2 py-0.5 text-[11px] font-medium ${statusStyles[page.status] ?? statusStyles.draft}`}>
@@ -173,20 +184,30 @@ function PageRow({ page }: { page: Awaited<ReturnType<typeof getPages>>['items']
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         )}
-        <ActionButton
-          action={setPageStatus.bind(null, page.id, 'archived')}
-          title="Archive"
+        <ConfirmButton
+          title="Archive Page"
+          description="This page will be hidden from public navigation and public routes."
+          confirmLabel="Archive Page"
+          variant="destructive"
           className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:border-gray-300 hover:text-gray-700 transition-colors disabled:opacity-50"
+          buttonTitle="Archive"
+          refreshOnConfirm
+          onConfirm={setPageStatus.bind(null, page.id, 'archived')}
         >
           <Archive className="h-4 w-4" />
-        </ActionButton>
-        <ActionButton
-          action={deletePage.bind(null, page.id)}
-          title="Delete"
+        </ConfirmButton>
+        <ConfirmButton
+          title="Delete Page"
+          description="This page and its sections will be deleted permanently."
+          confirmLabel="Delete Page"
+          variant="destructive"
           className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+          buttonTitle="Delete"
+          refreshOnConfirm
+          onConfirm={deletePage.bind(null, page.id)}
         >
           <Trash2 className="h-4 w-4" />
-        </ActionButton>
+        </ConfirmButton>
       </div>
     </div>
   );

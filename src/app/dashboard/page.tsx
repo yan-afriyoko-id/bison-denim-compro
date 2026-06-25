@@ -4,7 +4,6 @@ import { StatusDistributionChart } from '@/components/dashboard/stats/status-dis
 import Link from 'next/link';
 import {
   FileText,
-  Briefcase,
   Newspaper,
   Image as ImageIcon,
   Users,
@@ -39,9 +38,8 @@ function buildMonthlyCounts(records: { created_at: string }[], monthsBack = 6): 
 async function getDashboardData() {
   const supabase = await createServerSupabase();
 
-  const [pagesCount, servicesCount, postsCount, mediaCount, usersCount] = await Promise.all([
+  const [pagesCount, postsCount, mediaCount, usersCount] = await Promise.all([
     supabase.from('pages').select('*', { count: 'exact', head: true }),
-    supabase.from('services').select('*', { count: 'exact', head: true }),
     supabase.from('posts').select('*', { count: 'exact', head: true }),
     supabase.from('media').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
@@ -71,16 +69,14 @@ async function getDashboardData() {
     services: 0,
   }));
 
-  const [pageStatuses, postStatuses, serviceStatuses] = await Promise.all([
+  const [pageStatuses, postStatuses] = await Promise.all([
     supabase.from('pages').select('status'),
     supabase.from('posts').select('status'),
-    supabase.from('services').select('status'),
   ]);
 
   const allStatuses = [
     ...(pageStatuses.data ?? []),
     ...(postStatuses.data ?? []),
-    ...(serviceStatuses.data ?? []),
   ].map((r) => r.status);
 
   const statusCounts = allStatuses.reduce<Record<string, number>>((acc, s) => {
@@ -103,7 +99,6 @@ async function getDashboardData() {
   return {
     stats: {
       pages: pagesCount.count ?? 0,
-      services: servicesCount.count ?? 0,
       posts: postsCount.count ?? 0,
       media: mediaCount.count ?? 0,
       users: usersCount.count ?? 0,
@@ -116,7 +111,6 @@ async function getDashboardData() {
 
 const statCards = [
   { key: 'pages', label: 'Pages', icon: FileText },
-  { key: 'services', label: 'Services', icon: Briefcase },
   { key: 'posts', label: 'Posts', icon: Newspaper },
   { key: 'media', label: 'Media', icon: ImageIcon },
   { key: 'users', label: 'Users', icon: Users },
@@ -146,7 +140,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map(({ key, label, icon: Icon }) => (
           <div
             key={key}
@@ -247,8 +241,8 @@ export default async function DashboardPage() {
           {[
             { href: '/dashboard/hero', label: 'Edit Hero Slider', desc: 'Manage the homepage banner slides.' },
             { href: '/dashboard/pages', label: 'Manage Pages', desc: 'Create and edit public pages.' },
-            { href: '/dashboard/services', label: 'Manage Services', desc: 'Update products and service entries.' },
             { href: '/dashboard/posts', label: 'Write Post', desc: 'Create a new article or news post.' },
+            { href: '/dashboard/pages/builder?navMode=child_navbar&parentHref=%2Fservices', label: 'New Service Page', desc: 'Create a product page under the /services route.' },
           ].map((action) => (
             <Link
               key={action.href}

@@ -11,9 +11,9 @@ export default async function NewsPage() {
     <>
       <section className="border-b border-[#d4d4d4] px-6 py-24">
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="mb-4 text-4xl font-bold text-black sm:text-5xl">Berita</h1>
+          <h1 className="mb-4 text-4xl font-bold text-[#1E1E1E] sm:text-5xl">Berita</h1>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#555]">
-            Informasi terbaru seputar produk dan kegiatan {grouped.brand.site_name || 'Bison Denim'}.
+            Informasi terbaru seputar produk dan kegiatan {grouped.brand.site_name || 'kami'}.
           </p>
         </div>
       </section>

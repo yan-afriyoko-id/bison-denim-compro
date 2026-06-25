@@ -8,6 +8,65 @@ import { slugify } from '@/lib/utils';
 import { createAuditLog } from '@/lib/audit';
 import { friendlyDbError, normalizeDbText } from '@/lib/cms';
 import { hasDashboardModuleActionAccess } from '@/lib/permissions';
+import { buildChildPagePath, buildDefaultPagePath, findPageNavigationItem, resolvePagePublicPath } from '@/lib/page-public-path';
+import type { NavigationItem } from '@/types';
+
+async function syncPageNavigationVisibility(
+  supabase: Awaited<ReturnType<typeof createServerSupabase>>,
+  page: { id: string; slug: string; title: string; page_key?: string | null; status: 'draft' | 'published' | 'archived' }
+) {
+  const { data: navItems } = await supabase
+    .from('navigation_items')
+    .select('*')
+    .eq('location', 'header')
+    .order('sort_order', { ascending: true });
+
+  const existing = findPageNavigationItem(page, (navItems ?? []) as NavigationItem[]);
+  if (!existing) {
+    return;
+  }
+
+  const nextVisible = page.status === 'published';
+  if (existing.is_visible === nextVisible) {
+    return;
+  }
+
+  await supabase
+    .from('navigation_items')
+    .update({ is_visible: nextVisible })
+    .eq('id', existing.id);
+}
+
+async function revalidatePagePaths(
+  supabase: Awaited<ReturnType<typeof createServerSupabase>>,
+  pageId: string,
+  extraPaths: string[] = []
+) {
+  const [{ data: page }, { data: navItems }] = await Promise.all([
+    supabase.from('pages').select('slug, page_key, title').eq('id', pageId).maybeSingle(),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
+
+  if (!page) {
+    return;
+  }
+
+  const paths = new Set<string>(extraPaths.filter(Boolean));
+  paths.add(buildDefaultPagePath(page));
+  paths.add(resolvePagePublicPath(page, (navItems ?? []) as NavigationItem[]));
+
+  for (const path of paths) {
+    revalidatePath(path);
+
+    if (path.startsWith('/services/')) {
+      revalidatePath('/services');
+    }
+  }
+
+  if (page.page_key === 'home' || page.slug === 'home') {
+    revalidatePath('/');
+  }
+}
 
 export async function createPage(formData: FormData) {
   const supabase = await createServerSupabase();
@@ -67,7 +126,6 @@ export async function updatePage(pageId: string, formData: FormData) {
     status: formData.get('status'),
     seo_title: normalizeDbText(formData.get('seo_title')),
     seo_description: normalizeDbText(formData.get('seo_description')),
-    og_image_url: normalizeDbText(formData.get('og_image_url')),
     is_indexed: formData.get('is_indexed') === 'true',
   });
 
@@ -80,10 +138,6 @@ export async function updatePage(pageId: string, formData: FormData) {
     updated_by: profile.id,
     published_at: parsed.data.status === 'published' ? new Date().toISOString() : undefined,
   };
-
-  if (!profile || !hasDashboardModuleActionAccess(profile, 'pages', 'delete')) {
-    return { error: 'Unauthorized' };
-  }
 
   const { data: before } = await supabase
     .from('pages')
@@ -100,6 +154,14 @@ export async function updatePage(pageId: string, formData: FormData) {
     return { error: friendlyDbError(error.message) };
   }
 
+  await syncPageNavigationVisibility(supabase, {
+    id: pageId,
+    slug: parsed.data.slug,
+    title: parsed.data.title,
+    page_key: before?.page_key ?? null,
+    status: parsed.data.status,
+  });
+
   await createAuditLog({
     profile,
     action: 'update',
@@ -111,10 +173,10 @@ export async function updatePage(pageId: string, formData: FormData) {
 
   revalidatePath('/dashboard/pages');
   revalidatePath(`/dashboard/pages/builder?id=${pageId}`);
-  revalidatePath(`/${formData.get('slug') as string}`);
-  if (before?.page_key === 'home' || before?.slug === 'home' || parsed.data.slug === 'home') {
-    revalidatePath('/');
-  }
+  await revalidatePagePaths(supabase, pageId, [
+    before?.slug ? `/${before.slug}` : '',
+    parsed.data.slug ? `/${parsed.data.slug}` : '',
+  ]);
   return { success: 'Halaman berhasil diperbarui' };
 }
 
@@ -122,11 +184,17 @@ export async function deletePage(pageId: string) {
   const supabase = await createServerSupabase();
   const profile = await getCurrentProfile();
 
-  const { data: before } = await supabase
-    .from('pages')
-    .select('*')
-    .eq('id', pageId)
-    .single();
+  const [{ data: before }, { data: navItems }] = await Promise.all([
+    supabase.from('pages').select('*').eq('id', pageId).single(),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
+
+  if (before) {
+    const navItem = findPageNavigationItem(before, (navItems ?? []) as NavigationItem[]);
+    if (navItem) {
+      await supabase.from('navigation_items').delete().eq('id', navItem.id);
+    }
+  }
 
   const { error } = await supabase
     .from('pages')
@@ -146,6 +214,12 @@ export async function deletePage(pageId: string) {
   });
 
   revalidatePath('/dashboard/pages');
+  if (before?.slug) {
+    revalidatePath(`/${before.slug}`);
+    if (`/${before.slug}`.startsWith('/services/')) {
+      revalidatePath('/services');
+    }
+  }
   if (before?.page_key === 'home' || before?.slug === 'home') {
     revalidatePath('/');
   }
@@ -183,13 +257,7 @@ export async function publishPage(pageId: string) {
 
   revalidatePath('/dashboard/pages');
   revalidatePath('/', 'layout');
-  const { data: page } = await supabase.from('pages').select('slug, page_key').eq('id', pageId).maybeSingle();
-  if (page?.slug) {
-    revalidatePath(`/${page.slug}`);
-  }
-  if (page?.page_key === 'home' || page?.slug === 'home') {
-    revalidatePath('/');
-  }
+  await revalidatePagePaths(supabase, pageId);
   return { success: 'Halaman berhasil dipublikasikan' };
 }
 
@@ -207,11 +275,15 @@ export async function setPageStatus(pageId: string, status: 'draft' | 'published
     published_at: status === 'published' ? new Date().toISOString() : null,
   };
 
-  const { data: page } = await supabase.from('pages').select('slug, page_key').eq('id', pageId).maybeSingle();
   const { error } = await supabase.from('pages').update(payload).eq('id', pageId);
 
   if (error) {
     return { error: friendlyDbError(error.message) };
+  }
+
+  const { data: page } = await supabase.from('pages').select('id, slug, title, page_key, status').eq('id', pageId).single();
+  if (page) {
+    await syncPageNavigationVisibility(supabase, page);
   }
 
   await createAuditLog({
@@ -223,12 +295,7 @@ export async function setPageStatus(pageId: string, status: 'draft' | 'published
   });
 
   revalidatePath('/dashboard/pages');
-  if (page?.slug) {
-    revalidatePath(`/${page.slug}`);
-  }
-  if (page?.page_key === 'home' || page?.slug === 'home') {
-    revalidatePath('/');
-  }
+  await revalidatePagePaths(supabase, pageId);
   return { success: 'Status halaman berhasil diperbarui' };
 }
 
@@ -263,7 +330,6 @@ export async function duplicatePage(pageId: string) {
       status: 'draft',
       seo_title: page.seo_title,
       seo_description: page.seo_description,
-      og_image_url: page.og_image_url,
       is_indexed: page.is_indexed,
       created_by: profile.id,
       updated_by: profile.id,
@@ -276,7 +342,7 @@ export async function duplicatePage(pageId: string) {
   }
 
   if ((sections?.length ?? 0) > 0) {
-    const duplicatedSections = sections!.map((section) => ({
+    const duplicatedSections = sections.map((section) => ({
       page_id: newPage.id,
       section_type: section.section_type,
       internal_name: section.internal_name,
@@ -302,4 +368,104 @@ export async function duplicatePage(pageId: string) {
 
   revalidatePath('/dashboard/pages');
   return { data: newPage, success: 'Halaman berhasil diduplikasi' };
+}
+
+export async function getHeaderNavItems() {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from('navigation_items').select('*').eq('location', 'header').order('sort_order', { ascending: true });
+  return (data ?? []) as NavigationItem[];
+}
+
+export async function getPageNavigationInfo(pageId: string) {
+  const supabase = await createServerSupabase();
+  const { data: page } = await supabase.from('pages').select('slug, title, page_key').eq('id', pageId).single();
+  if (!page) return { navItem: null, navItems: [], publicHref: '' };
+
+  const { data: navItems } = await supabase
+    .from('navigation_items')
+    .select('*')
+    .eq('location', 'header')
+    .order('sort_order', { ascending: true });
+
+  const resolvedNavItems = (navItems ?? []) as NavigationItem[];
+  const navItem = findPageNavigationItem(page, resolvedNavItems) ?? null;
+
+  return {
+    navItem,
+    navItems: resolvedNavItems,
+    publicHref: resolvePagePublicPath(page, resolvedNavItems),
+  };
+}
+
+export async function upsertPageNavigation(
+  pageId: string,
+  navMode: 'none' | 'navbar' | 'child_navbar',
+  parentId?: string | null
+) {
+  const supabase = await createServerSupabase();
+  const profile = await getCurrentProfile();
+
+  if (!profile || !hasDashboardModuleActionAccess(profile, 'navigation', 'manage')) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { data: page } = await supabase.from('pages').select('slug, title, status, page_key').eq('id', pageId).single();
+  if (!page) return { error: 'Page not found' };
+
+  const { data: navItems } = await supabase
+    .from('navigation_items')
+    .select('*')
+    .eq('location', 'header')
+    .order('sort_order', { ascending: true });
+
+  const existingItems = (navItems ?? []) as NavigationItem[];
+  const existing = findPageNavigationItem(page, existingItems) ?? null;
+
+  if (navMode === 'none') {
+    if (existing) {
+      const { data: before } = await supabase.from('navigation_items').select('*').eq('id', existing.id).single();
+      const { error } = await supabase.from('navigation_items').delete().eq('id', existing.id);
+      if (error) return { error: friendlyDbError(error.message) };
+      await createAuditLog({ profile, action: 'delete', entityType: 'navigation_item', entityId: existing.id, before });
+    }
+    revalidatePath('/dashboard/pages');
+    revalidatePath('/', 'layout');
+    await revalidatePagePaths(supabase, pageId);
+    return { success: 'Removed from navigation' };
+  }
+
+  const href =
+    navMode === 'child_navbar' && parentId
+      ? buildChildPagePath(existingItems.find((item) => item.id === parentId)?.href ?? '/', page.slug)
+      : buildDefaultPagePath(page);
+
+  const payload = {
+    location: 'header' as const,
+    label: page.title,
+    href,
+    parent_id: navMode === 'child_navbar' ? (parentId || null) : null,
+    sort_order: 0,
+    is_visible: page.status === 'published',
+    open_new_tab: false,
+  };
+
+  if (existing) {
+    const { error } = await supabase.from('navigation_items').update(payload).eq('id', existing.id);
+    if (error) return { error: friendlyDbError(error.message) };
+  } else {
+    const { data: created, error } = await supabase.from('navigation_items').insert(payload).select('*').single();
+    if (error) return { error: friendlyDbError(error.message) };
+    await createAuditLog({
+      profile,
+      action: 'create',
+      entityType: 'navigation_item',
+      entityId: created.id,
+      after: created,
+    });
+  }
+
+  revalidatePath('/dashboard/pages');
+  revalidatePath('/', 'layout');
+  await revalidatePagePaths(supabase, pageId);
+  return { success: 'Navigation updated' };
 }

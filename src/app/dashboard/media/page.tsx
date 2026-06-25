@@ -9,6 +9,7 @@ import type { Media } from '@/types';
 import { formatBytes } from '@/lib/utils';
 import { paginateArray } from '@/lib/pagination';
 import { PaginationControls } from '@/components/dashboard/pagination-controls';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 async function fetchMedia(): Promise<Media[]> {
   try {
@@ -77,7 +78,6 @@ export default function MediaPage() {
   }
 
   async function handleDelete(item: Media) {
-    if (!confirm(`Delete "${item.filename}"?`)) return;
     const result = await deleteMediaItem(item.id, item.path);
     if (result.error) {
       toast.error(result.error);
@@ -170,7 +170,7 @@ export default function MediaPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 text-xs font-bold rounded-sm hover:bg-black transition-colors"
+              className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 text-xs font-bold rounded-sm hover:bg-[#1E1E1E] transition-colors"
             >
               <Upload className="h-3.5 w-3.5" />
               Choose Files
@@ -191,7 +191,7 @@ export default function MediaPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {paginatedMedia.items.map((item) => (
               <div
                 key={item.id}
@@ -286,7 +286,7 @@ export default function MediaPage() {
                         loadMedia();
                       }
                     }}
-                    className="flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-2 text-xs font-bold text-white hover:bg-black"
+                    className="flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-2 text-xs font-bold text-white hover:bg-[#1E1E1E]"
                   >
                     <Save className="h-3.5 w-3.5" />
                     Save
@@ -328,13 +328,17 @@ export default function MediaPage() {
                   <ExternalLink className="h-3.5 w-3.5" />
                   Open
                 </a>
-                <button
-                  onClick={() => handleDelete(selectedItem)}
+                <ConfirmButton
+                  title="Delete Media"
+                  description={`Delete "${selectedItem.filename}" from the media library?`}
+                  confirmLabel="Delete Media"
+                  variant="destructive"
                   className="ml-auto flex items-center gap-1.5 rounded-sm border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
+                  onConfirm={() => handleDelete(selectedItem)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Delete
-                </button>
+                </ConfirmButton>
               </div>
             </div>
           )}

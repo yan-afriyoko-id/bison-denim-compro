@@ -8,7 +8,6 @@ import type { DashboardModuleKey, Profile } from '@/types';
 import {
   LayoutDashboard,
   FileText,
-  Briefcase,
   Newspaper,
   Image as ImageIcon,
   Users,
@@ -16,7 +15,6 @@ import {
   ScrollText,
   ChevronLeft,
   Presentation,
-  MenuSquare,
 } from 'lucide-react';
 import { useState } from 'react';
 import { hasDashboardModuleAccess } from '@/lib/permissions';
@@ -25,9 +23,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, moduleKey: 'overview' as DashboardModuleKey },
   { href: '/dashboard/hero', label: 'Hero Slider', icon: Presentation, moduleKey: 'hero' as DashboardModuleKey },
   { href: '/dashboard/pages', label: 'Pages', icon: FileText, moduleKey: 'pages' as DashboardModuleKey },
-  { href: '/dashboard/services', label: 'Services', icon: Briefcase, moduleKey: 'services' as DashboardModuleKey },
   { href: '/dashboard/posts', label: 'Posts', icon: Newspaper, moduleKey: 'posts' as DashboardModuleKey },
-  { href: '/dashboard/navigation', label: 'Navigation', icon: MenuSquare, moduleKey: 'navigation' as DashboardModuleKey },
   { href: '/dashboard/media', label: 'Media', icon: ImageIcon, moduleKey: 'media' as DashboardModuleKey },
   { href: '/dashboard/users', label: 'Users', icon: Users, moduleKey: 'users' as DashboardModuleKey },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings, moduleKey: 'settings' as DashboardModuleKey },
@@ -50,7 +46,7 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        'flex flex-col border-r border-[#2a2a2a] bg-[#111111] transition-all duration-300',
+        'flex flex-col border-r border-[#2a2a2a] bg-[#1E1E1E] transition-all duration-300',
         collapsed ? 'w-16' : 'w-60'
       )}
     >

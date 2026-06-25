@@ -7,11 +7,11 @@ export default async function ContactPage() {
   return (
     <ContactPageClient
       contactInfo={{
-        siteName: grouped.brand.site_name || 'Bison Denim',
+        siteName: grouped.brand.site_name,
         description: grouped.company.site_description,
-        email: grouped.contact.contact_email || 'hello@bison-denim.com',
-        phone: grouped.contact.contact_phone || '+62-22-4234-567',
-        address: grouped.contact.contact_address || 'Jl. Braga No. 88\nBandung 40111\nIndonesia',
+        email: grouped.contact.contact_email,
+        phone: grouped.contact.contact_phone,
+        address: grouped.contact.contact_address,
       }}
     />
   );

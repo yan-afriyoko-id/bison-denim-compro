@@ -39,7 +39,7 @@ export default function LoginPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-[#1E1E1E]/55" />
         <div className="absolute inset-0 flex flex-col justify-between p-12">
           <span className="text-white/70 text-xs font-bold uppercase tracking-[0.2em]">
             Admin Dashboard
@@ -68,14 +68,14 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <div className="text-sm font-bold text-black tracking-tight uppercase">
+              <div className="text-sm font-bold text-[#1E1E1E] tracking-tight uppercase">
                 {siteName}
               </div>
             </div>
           </Link>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-black tracking-tight">Masuk</h1>
+            <h1 className="text-3xl font-bold text-[#1E1E1E] tracking-tight">Masuk</h1>
             <p className="text-[#555] text-sm mt-2 leading-relaxed">
               Masuk ke dashboard admin untuk mengelola konten.
             </p>
@@ -83,7 +83,7 @@ export default function LoginPage() {
 
           <form action={formAction} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-black mb-1.5">
+              <label htmlFor="email" className="block text-sm font-bold text-[#1E1E1E] mb-1.5">
                 Email
               </label>
               <input
@@ -91,18 +91,18 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 placeholder="admin@bison.com"
-                className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none focus:border-black transition-colors duration-200"
+                className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none focus:border-[#1E1E1E] transition-colors duration-200"
                 required
               />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="block text-sm font-bold text-black">
+                <label htmlFor="password" className="block text-sm font-bold text-[#1E1E1E]">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-[#555] hover:text-black transition-colors duration-200"
+                  className="text-xs text-[#555] hover:text-[#1E1E1E] transition-colors duration-200"
                 >
                   Lupa password?
                 </Link>
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-black outline-none focus:border-black transition-colors duration-200"
+                className="w-full border border-[#d4d4d4] px-4 py-2.5 text-sm text-[#1E1E1E] outline-none focus:border-[#1E1E1E] transition-colors duration-200"
                 required
               />
             </div>
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={pending}
-              className="w-full bg-black text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200 disabled:opacity-50"
+              className="w-full bg-[#1E1E1E] text-white font-bold text-sm px-8 py-3 hover:bg-[#333] transition-colors duration-200 disabled:opacity-50"
             >
               {pending ? 'Memproses...' : 'Masuk'}
             </button>

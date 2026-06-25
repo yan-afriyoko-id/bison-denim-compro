@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { RichTextDocument, RichTextMark, RichTextNode } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -163,6 +163,7 @@ function applyMarks(node: ReactNode, marks?: RichTextMark[]) {
             href={href}
             target={mark.attrs?.target === '_blank' ? '_blank' : undefined}
             rel={mark.attrs?.target === '_blank' ? 'noopener noreferrer' : undefined}
+            style={{ color: 'var(--rich-text-link-color, currentColor)' }}
           >
             {acc}
           </a>
@@ -211,12 +212,20 @@ export function RichTextRenderer({
   content,
   className,
   mode = 'paragraphs',
+  style,
+  linkColor,
 }: {
   content: unknown;
   className?: string;
   mode?: 'paragraphs' | 'list';
+  style?: CSSProperties;
+  linkColor?: string;
 }) {
   const normalized = normalizeRichTextValue(content, mode);
+  const mergedStyle: CSSProperties = {
+    ...style,
+    ...(linkColor ? ({ ['--rich-text-link-color' as string]: linkColor } as CSSProperties) : {}),
+  };
 
-  return <div className={cn('rich-text-content', className)}>{renderNodes(normalized.content, 'rich-text')}</div>;
+  return <div className={cn('rich-text-content', className)} style={mergedStyle}>{renderNodes(normalized.content, 'rich-text')}</div>;
 }

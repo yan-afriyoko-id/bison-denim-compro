@@ -45,7 +45,7 @@ export default function CareerPage() {
       <section className="py-20 px-6 bg-white border-b border-[#d4d4d4]">
         <div className="mx-auto max-w-7xl text-center">
           <FadeIn>
-            <h1 className="text-4xl sm:text-5xl font-bold text-[#111111]">Karir</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold text-[#1E1E1E]">Karir</h1>
             <p className="mt-4 text-lg text-[#555555] max-w-xl mx-auto">
               Bergabunglah dengan tim Bison Denim
             </p>
@@ -64,13 +64,13 @@ export default function CareerPage() {
                   placeholder="Cari berdasarkan posisi..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full h-12 pl-11 pr-4 border border-[#d4d4d4] bg-white text-sm text-[#111111] placeholder:text-[#555555] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
+                  className="w-full h-12 pl-11 pr-4 border border-[#d4d4d4] bg-white text-sm text-[#1E1E1E] placeholder:text-[#555555] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
                 />
               </div>
               <select
                 value={dept}
                 onChange={(e) => setDept(e.target.value)}
-                className="h-12 px-4 border border-[#d4d4d4] bg-white text-sm text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
+                className="h-12 px-4 border border-[#d4d4d4] bg-white text-sm text-[#1E1E1E] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
               >
                 <option value="">Semua Departemen</option>
                 {DEPARTMENTS.map((d) => (
@@ -80,7 +80,7 @@ export default function CareerPage() {
               <select
                 value={loc}
                 onChange={(e) => setLoc(e.target.value)}
-                className="h-12 px-4 border border-[#d4d4d4] bg-white text-sm text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
+                className="h-12 px-4 border border-[#d4d4d4] bg-white text-sm text-[#1E1E1E] focus:outline-none focus:ring-2 focus:ring-[#1B2A3F]"
               >
                 <option value="">Semua Lokasi</option>
                 {LOCATIONS.map((l) => (
@@ -94,24 +94,24 @@ export default function CareerPage() {
             <div className="flex items-center gap-2 mb-6">
               <span className="text-xs text-[#555555]">Filter:</span>
               {search && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#111111] text-xs font-medium bg-white">
+                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#1E1E1E] text-xs font-medium bg-white">
                   {search}
                   <button onClick={() => setSearch('')}><X className="w-3 h-3" /></button>
                 </span>
               )}
               {dept && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#111111] text-xs font-medium bg-white">
+                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#1E1E1E] text-xs font-medium bg-white">
                   {dept}
                   <button onClick={() => setDept('')}><X className="w-3 h-3" /></button>
                 </span>
               )}
               {loc && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#111111] text-xs font-medium bg-white">
+                <span className="inline-flex items-center gap-1 px-3 py-1 border border-[#d4d4d4] text-[#1E1E1E] text-xs font-medium bg-white">
                   {loc}
                   <button onClick={() => setLoc('')}><X className="w-3 h-3" /></button>
                 </span>
               )}
-              <button onClick={clearFilters} className="text-xs text-[#555555] hover:text-[#111111] ml-2">
+              <button onClick={clearFilters} className="text-xs text-[#555555] hover:text-[#1E1E1E] ml-2">
                 Hapus semua
               </button>
             </div>
@@ -124,7 +124,7 @@ export default function CareerPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-20 text-[#555555]">
               <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p className="font-bold text-[#111111]">Tidak ada posisi ditemukan</p>
+              <p className="font-bold text-[#1E1E1E]">Tidak ada posisi ditemukan</p>
               <p className="text-sm mt-1">Coba sesuaikan pencarian atau filter Anda</p>
             </div>
           ) : (
@@ -134,7 +134,7 @@ export default function CareerPage() {
                   <div className="border border-[#d4d4d4] bg-white p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
-                        <h3 className="text-[#111111] font-bold text-base">{job.title}</h3>
+                        <h3 className="text-[#1E1E1E] font-bold text-base">{job.title}</h3>
                         <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-[#555555]">
                           <span className="flex items-center gap-1.5">
                             <Building2 className="w-3.5 h-3.5" />

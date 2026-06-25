@@ -11,6 +11,7 @@ import {
 } from '@/actions/navigation.actions';
 import { paginateArray } from '@/lib/pagination';
 import { PaginationControls } from '@/components/dashboard/pagination-controls';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 type NavigationDraft = {
   id: string | null;
@@ -126,10 +127,6 @@ export function NavigationManager({
   }
 
   async function handleDelete(itemId: string) {
-    if (!confirm('Delete this navigation item?')) {
-      return;
-    }
-
     const result = await deleteNavigationItem(itemId);
     if (result.error) {
       toast.error(result.error);
@@ -164,7 +161,7 @@ export function NavigationManager({
             <button
               type="button"
               onClick={openCreateForm}
-              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
             >
               <Plus className="h-4 w-4" />
               New Item
@@ -235,15 +232,18 @@ export function NavigationManager({
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => startTransition(() => void handleDelete(item.id))}
+                        <ConfirmButton
+                          title="Delete Navigation Item"
+                          description="This navigation item and its child links will be removed."
+                          confirmLabel="Delete Item"
+                          variant="destructive"
                           disabled={isPending}
                           className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                          title="Delete"
+                          buttonTitle="Delete"
+                          onConfirm={() => handleDelete(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
+                        </ConfirmButton>
                       </div>
                     </td>
                   </tr>
@@ -270,7 +270,7 @@ export function NavigationManager({
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1E1E]/40 p-4">
           <div className="w-full max-w-lg border border-gray-200 bg-white rounded-sm shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
@@ -355,7 +355,7 @@ export function NavigationManager({
                 type="button"
                 onClick={() => startTransition(() => void handleSave())}
                 disabled={isPending}
-                className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-black disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E] disabled:opacity-50"
               >
                 <Save className="h-3.5 w-3.5" />
                 {isPending ? 'Saving...' : 'Save Item'}

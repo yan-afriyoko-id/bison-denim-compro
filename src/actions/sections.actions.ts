@@ -6,13 +6,26 @@ import { getCurrentProfile } from '@/lib/auth/helpers';
 import { createAuditLog } from '@/lib/audit';
 import { friendlyDbError } from '@/lib/cms';
 import { hasDashboardModuleActionAccess } from '@/lib/permissions';
+import { buildDefaultPagePath, resolvePagePublicPath } from '@/lib/page-public-path';
+import type { NavigationItem } from '@/types';
 
 async function revalidateSectionPage(pageId: string) {
   const supabase = await createServerSupabase();
-  const { data: page } = await supabase.from('pages').select('slug, page_key').eq('id', pageId).maybeSingle();
+  const [{ data: page }, { data: navItems }] = await Promise.all([
+    supabase.from('pages').select('slug, page_key, title').eq('id', pageId).maybeSingle(),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
 
   if (page?.slug) {
-    revalidatePath(`/${page.slug}`);
+    const defaultPath = buildDefaultPagePath(page);
+    const publicPath = resolvePagePublicPath(page, (navItems ?? []) as NavigationItem[]);
+
+    revalidatePath(defaultPath);
+    revalidatePath(publicPath);
+
+    if (defaultPath.startsWith('/services/') || publicPath.startsWith('/services/')) {
+      revalidatePath('/services');
+    }
   }
   if (page?.page_key === 'home' || page?.slug === 'home') {
     revalidatePath('/');
@@ -27,7 +40,6 @@ export async function createSection(pageId: string, sectionType: string) {
     return { error: 'Unauthorized' };
   }
 
-  // Get max sort_order
   const { data: maxOrder } = await supabase
     .from('page_sections')
     .select('sort_order')

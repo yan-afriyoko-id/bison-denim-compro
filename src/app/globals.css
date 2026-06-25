@@ -20,7 +20,7 @@
   --color-surface: #f7f7f7;
   --color-surface-elevated: #efefef;
   --color-border: #d4d4d4;
-  --color-text-primary: #111111;
+  --color-text-primary: #1E1E1E;
   --color-text-secondary: #555555;
   --color-text-muted: #999999;
   --color-accent: #1B2A3F;
@@ -123,12 +123,12 @@ button:disabled,
 }
 
 ::selection {
-  background: #111111;
+  background: #1E1E1E;
   color: #ffffff;
 }
 
 ::-moz-selection {
-  background: #111111;
+  background: #1E1E1E;
   color: #ffffff;
 }
 
@@ -143,7 +143,7 @@ button:disabled,
 .rich-text-content h2,
 .rich-text-content h3,
 .rich-text-content h4 {
-  color: #111111;
+  color: #1E1E1E;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -190,7 +190,7 @@ button:disabled,
 }
 
 .rich-text-content a {
-  color: #111111;
+  color: #1E1E1E;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }

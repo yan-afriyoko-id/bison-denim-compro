@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useTransition } from 'react';
-import type { DashboardPermissionSet, DashboardRole, Profile } from '@/types';
+import type { DashboardModuleAction, DashboardPermissionSet, DashboardRole, Profile } from '@/types';
 import {
   CheckCircle,
   Pencil,
@@ -29,12 +29,12 @@ import { createDashboardUser, deleteUser, updateUserProfile } from '@/actions/us
 import { toast } from 'sonner';
 import { paginateArray } from '@/lib/pagination';
 import { PaginationControls } from '@/components/dashboard/pagination-controls';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 const roleStyles: Record<string, string> = {
   super_admin: 'bg-gray-900 text-white border-gray-900',
   admin: 'bg-blue-50 text-blue-700 border-blue-200',
   editor: 'bg-green-50 text-green-700 border-green-200',
-  viewer: 'bg-gray-50 text-gray-500 border-gray-200',
 };
 
 type EditorMode = 'create' | 'edit';
@@ -58,10 +58,10 @@ export function UsersManager({
   const [passwordDraft, setPasswordDraft] = useState('');
   const [passwordConfirmationDraft, setPasswordConfirmationDraft] = useState('');
   const [fullNameDraft, setFullNameDraft] = useState('');
-  const [roleDraft, setRoleDraft] = useState<DashboardRole>('viewer');
+  const [roleDraft, setRoleDraft] = useState<DashboardRole>('editor');
   const [isActiveDraft, setIsActiveDraft] = useState(true);
   const [permissionsDraft, setPermissionsDraft] = useState<DashboardPermissionSet>(
-    getDefaultDashboardPermissions('viewer')
+    getDefaultDashboardPermissions('editor')
   );
   const [isPending, startTransition] = useTransition();
 
@@ -93,9 +93,9 @@ export function UsersManager({
     setPasswordDraft('');
     setPasswordConfirmationDraft('');
     setFullNameDraft('');
-    setRoleDraft('viewer');
+    setRoleDraft('editor');
     setIsActiveDraft(true);
-    setPermissionsDraft(getDefaultDashboardPermissions('viewer'));
+    setPermissionsDraft(getDefaultDashboardPermissions('editor'));
   }
 
   function openUser(user: Profile) {
@@ -117,9 +117,9 @@ export function UsersManager({
     setPasswordDraft('');
     setPasswordConfirmationDraft('');
     setFullNameDraft('');
-    setRoleDraft('viewer');
+    setRoleDraft('editor');
     setIsActiveDraft(true);
-    setPermissionsDraft(getDefaultDashboardPermissions('viewer'));
+    setPermissionsDraft(getDefaultDashboardPermissions('editor'));
   }
 
   function updateModulePermission(key: keyof DashboardPermissionSet['modules'], value: boolean) {
@@ -129,24 +129,48 @@ export function UsersManager({
         ...prev.modules,
         [key]: value,
       },
+      module_actions: value
+        ? prev.module_actions
+        : {
+            ...prev.module_actions,
+            [key]: dashboardModuleActionsByModule[key].reduce<Partial<Record<DashboardModuleAction, boolean>>>(
+              (acc, action) => {
+                acc[action.key] = false;
+                return acc;
+              },
+              {}
+            ),
+          },
     }));
   }
 
   function updateModuleActionPermission(
     moduleKey: keyof DashboardPermissionSet['module_actions'],
-    actionKey: string,
+    actionKey: DashboardModuleAction,
     value: boolean
   ) {
-    setPermissionsDraft((prev) => ({
-      ...prev,
-      module_actions: {
-        ...prev.module_actions,
-        [moduleKey]: {
-          ...prev.module_actions[moduleKey],
-          [actionKey]: value,
+    setPermissionsDraft((prev) => {
+      const nextModuleActions = {
+        ...prev.module_actions[moduleKey],
+        [actionKey]: value,
+      };
+
+      const hasAnyActionEnabled = dashboardModuleActionsByModule[moduleKey].some(
+        (action) => nextModuleActions[action.key] === true
+      );
+
+      return {
+        ...prev,
+        modules: {
+          ...prev.modules,
+          [moduleKey]: hasAnyActionEnabled,
         },
-      },
-    }));
+        module_actions: {
+          ...prev.module_actions,
+          [moduleKey]: nextModuleActions,
+        },
+      };
+    });
   }
 
   function updateRole(nextRole: DashboardRole) {
@@ -230,8 +254,6 @@ export function UsersManager({
   }
 
   async function handleDelete(user: Profile) {
-    if (!confirm(`Delete user "${user.full_name ?? user.id}"? This action cannot be undone.`)) return;
-
     const result = await deleteUser(user.id);
     if (result.error) {
       toast.error(result.error);
@@ -275,7 +297,6 @@ export function UsersManager({
               <option value="super_admin">Super Admin</option>
               <option value="admin">Admin</option>
               <option value="editor">Editor</option>
-              <option value="viewer">Viewer</option>
             </select>
             <select
               value={statusFilter}
@@ -293,7 +314,7 @@ export function UsersManager({
               <button
                 type="button"
                 onClick={openCreateUser}
-                className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+                className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
               >
                 <UserPlus className="h-4 w-4" />
                 Add User
@@ -319,7 +340,7 @@ export function UsersManager({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-bold text-gray-900">{user.full_name ?? 'Unnamed'}</span>
-                    <span className={`inline-block rounded-sm border px-2 py-0.5 text-[11px] font-medium ${roleStyles[user.role] ?? roleStyles.viewer}`}>
+                    <span className={`inline-block rounded-sm border px-2 py-0.5 text-[11px] font-medium ${roleStyles[user.role] ?? roleStyles.editor}`}>
                       {roleLabel(user.role)}
                     </span>
                     {user.is_active ? (
@@ -340,14 +361,17 @@ export function UsersManager({
                     <Pencil className="h-4 w-4" />
                   </button>
                   {canDeleteUser && user.id !== currentProfile.id && (
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(user)}
+                    <ConfirmButton
+                      title="Delete User"
+                      description={`Delete user "${user.full_name ?? user.id}"? This action cannot be undone.`}
+                      confirmLabel="Delete User"
+                      variant="destructive"
                       className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Delete"
+                      buttonTitle="Delete"
+                      onConfirm={() => handleDelete(user)}
                     >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </ConfirmButton>
                   )}
                   <div className="ml-2 text-right text-xs text-gray-400">
                   <p>{user.is_active ? 'Active' : 'Inactive'}</p>
@@ -374,7 +398,7 @@ export function UsersManager({
       )}
 
       {editorMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1E1E]/30 p-4">
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-sm border border-gray-200 bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <div>
@@ -440,7 +464,6 @@ export function UsersManager({
                     )}
                     {currentProfile.role === 'super_admin' && <option value="admin">Admin</option>}
                     <option value="editor">Editor</option>
-                    <option value="viewer">Viewer</option>
                   </select>
                 </Field>
               </div>
@@ -515,7 +538,7 @@ export function UsersManager({
                 type="button"
                 onClick={() => startTransition(() => void persistUser())}
                 disabled={isPending}
-                className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-black disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-[#1E1E1E] disabled:opacity-50"
               >
                 {editorMode === 'create' ? <Plus className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
                 {editorMode === 'create' ? 'Create User' : 'Save Changes'}

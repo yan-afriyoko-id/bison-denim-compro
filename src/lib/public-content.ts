@@ -1,5 +1,6 @@
 import { createServerSupabase } from '@/lib/supabase/server';
 import { defaultGroupedSiteSettings, groupSiteSettings } from '@/lib/cms';
+import { findPageNavigationItem, resolvePagePublicPath } from '@/lib/page-public-path';
 export { getPostCategoryLabel } from '@/lib/public-content-shared';
 import type { RichTextDocument } from '@/types';
 import type {
@@ -46,7 +47,7 @@ const FALLBACK_NAV_ITEMS: NavigationItem[] = [
   {
     id: 'fallback-nav-home',
     location: 'header',
-    label: 'Home',
+    label: 'Beranda',
     href: '/',
     parent_id: null,
     sort_order: 1,
@@ -57,7 +58,7 @@ const FALLBACK_NAV_ITEMS: NavigationItem[] = [
   {
     id: 'fallback-nav-about',
     location: 'header',
-    label: 'About',
+    label: 'Tentang',
     href: '/about/company-information',
     parent_id: null,
     sort_order: 2,
@@ -66,20 +67,9 @@ const FALLBACK_NAV_ITEMS: NavigationItem[] = [
     locale: 'id',
   },
   {
-    id: 'fallback-nav-about-company',
-    location: 'header',
-    label: 'Company Information',
-    href: '/about/company-information',
-    parent_id: 'fallback-nav-about',
-    sort_order: 1,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
     id: 'fallback-nav-services',
     location: 'header',
-    label: 'Products',
+    label: 'Produk',
     href: '/services',
     parent_id: null,
     sort_order: 3,
@@ -88,64 +78,9 @@ const FALLBACK_NAV_ITEMS: NavigationItem[] = [
     locale: 'id',
   },
   {
-    id: 'fallback-nav-services-denim',
-    location: 'header',
-    label: 'Denim Collection',
-    href: '/services/denim-collection',
-    parent_id: 'fallback-nav-services',
-    sort_order: 1,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
-    id: 'fallback-nav-services-shirts',
-    location: 'header',
-    label: 'Shirts',
-    href: '/services/custom-tailoring',
-    parent_id: 'fallback-nav-services',
-    sort_order: 2,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
-    id: 'fallback-nav-services-hoodie',
-    location: 'header',
-    label: 'Hoodie & Sweater',
-    href: '/services/wholesale-supply',
-    parent_id: 'fallback-nav-services',
-    sort_order: 3,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
-    id: 'fallback-nav-services-accessories',
-    location: 'header',
-    label: 'Fashion Accessories',
-    href: '/services/sustainable-fashion',
-    parent_id: 'fallback-nav-services',
-    sort_order: 4,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
-    id: 'fallback-nav-services-other',
-    location: 'header',
-    label: 'More Products',
-    href: '/services/brand-collaboration',
-    parent_id: 'fallback-nav-services',
-    sort_order: 5,
-    is_visible: true,
-    open_new_tab: false,
-    locale: 'id',
-  },
-  {
     id: 'fallback-nav-news',
     location: 'header',
-    label: 'News',
+    label: 'Berita',
     href: '/news',
     parent_id: null,
     sort_order: 4,
@@ -156,7 +91,7 @@ const FALLBACK_NAV_ITEMS: NavigationItem[] = [
   {
     id: 'fallback-nav-contact',
     location: 'header',
-    label: 'Contact',
+    label: 'Kontak',
     href: '/contact-us',
     parent_id: null,
     sort_order: 5,
@@ -236,6 +171,8 @@ export const FALLBACK_HOMEPAGE_SECTIONS: PageSection[] = [
   },
 ];
 
+// Legacy demo data kept here intentionally for reference while the public service flow now reads from Supabase content.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FALLBACK_SERVICES: Service[] = [
   {
     id: 'fallback-service-denim',
@@ -707,6 +644,14 @@ const FALLBACK_PAGES: Record<string, { page: Page; sections: PageSection[] }> = 
   },
 };
 
+const PUBLIC_HEADER_NAV: Array<Pick<NavigationItem, 'href' | 'label' | 'sort_order'>> = [
+  { href: '/', label: 'Beranda', sort_order: 1 },
+  { href: '/about/company-information', label: 'Tentang', sort_order: 2 },
+  { href: '/services', label: 'Produk', sort_order: 3 },
+  { href: '/news', label: 'Berita', sort_order: 4 },
+  { href: '/contact-us', label: 'Kontak', sort_order: 5 },
+];
+
 function withFallbackSiteSettings(grouped: ReturnType<typeof defaultGroupedSiteSettings>) {
   return {
     brand: {
@@ -791,11 +736,67 @@ export async function getNavigationTree(location: NavigationItem['location'] = '
     .order('sort_order', { ascending: true });
 
   const items = ((data ?? []) as NavigationItem[]);
-  const visibleItems = items.length > 0
-    ? items
-    : FALLBACK_NAV_ITEMS.filter((item) => item.location === location && item.is_visible);
 
-  return buildNavigationTree(visibleItems);
+  if (location === 'header') {
+    const baseItems = items.length > 0
+      ? items.filter((item) => item.parent_id === null && item.is_visible)
+      : FALLBACK_NAV_ITEMS;
+
+    const visibleRootHrefs = new Set(baseItems.map((item) => item.href));
+    const canonicalItems = PUBLIC_HEADER_NAV
+      .filter((item) => visibleRootHrefs.has(item.href) || items.length === 0)
+      .map((item) => ({
+        id: `public-header-${item.sort_order}`,
+        location: 'header' as const,
+        label: item.label,
+        href: item.href,
+        parent_id: null,
+        sort_order: item.sort_order,
+        is_visible: true,
+        open_new_tab: false,
+        locale: 'id',
+        children: [],
+      }));
+
+    return canonicalItems;
+  }
+
+  if (items.length > 0) {
+    const pageCandidates = items
+      .filter((item) => item.href.startsWith('/') && item.href !== '/')
+      .flatMap((item) => {
+        const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
+        const slugTail = normalizedHref.split('/').pop() ?? normalizedHref;
+
+        return Array.from(new Set([normalizedHref, slugTail])).filter(Boolean);
+      })
+      .filter((slug): slug is string => Boolean(slug));
+
+    const { data: pages } = pageCandidates.length > 0
+      ? await supabase.from('pages').select('slug, status').in('slug', Array.from(new Set(pageCandidates)))
+      : { data: [] };
+
+    const publishedSlugs = new Set(
+      ((pages ?? []) as Array<{ slug: string; status: Page['status'] }> )
+        .filter((page) => page.status === 'published')
+        .map((page) => page.slug)
+    );
+
+    const visibleItems = items.filter((item) => {
+      if (!item.href.startsWith('/') || item.href === '/') {
+        return true;
+      }
+
+      const normalizedHref = item.href.replace(/^\/+|\/+$/g, '');
+      const slugTail = normalizedHref.split('/').pop();
+
+      return publishedSlugs.has(normalizedHref) || (!!slugTail && publishedSlugs.has(slugTail));
+    });
+
+    return buildNavigationTree(visibleItems);
+  }
+
+  return buildNavigationTree(FALLBACK_NAV_ITEMS.filter((item) => item.location === location && item.is_visible));
 }
 
 export async function getDashboardNavigationItems(location: NavigationItem['location'] = 'header') {
@@ -814,34 +815,38 @@ export async function getPublicSiteSettings() {
   const { data } = await supabase
     .from('site_settings')
     .select('*')
-    .eq('is_public', true)
     .order('key', { ascending: true });
 
-  const settings = withFallbackSiteSettings(groupSiteSettings((data ?? []) as SiteSetting[]));
-  const byKey = new Map<string, unknown>();
+  const publicKeys = new Set(
+    (data ?? []).filter((s) => s.is_public).map((s) => s.key)
+  );
 
+  const publicData = (data ?? []).filter((s) => s.is_public);
+  const grouped = groupSiteSettings(publicData as SiteSetting[]);
+
+  // Only apply fallback for public settings with empty value
+  const settings = {
+    brand: {
+      site_name: publicKeys.has('site_name') ? (grouped.brand.site_name || FALLBACK_SITE_SETTINGS.brand.site_name) : '',
+      logo: publicKeys.has('logo') ? (grouped.brand.logo || FALLBACK_SITE_SETTINGS.brand.logo) : '',
+    },
+    company: {
+      site_description: publicKeys.has('site_description') ? (grouped.company.site_description || FALLBACK_SITE_SETTINGS.company.site_description) : '',
+      footer_description: publicKeys.has('footer_description') ? (grouped.company.footer_description || FALLBACK_SITE_SETTINGS.company.footer_description) : '',
+    },
+    contact: {
+      contact_email: publicKeys.has('contact_email') ? (grouped.contact.contact_email || FALLBACK_SITE_SETTINGS.contact.contact_email) : '',
+      contact_phone: publicKeys.has('contact_phone') ? (grouped.contact.contact_phone || FALLBACK_SITE_SETTINGS.contact.contact_phone) : '',
+      contact_address: publicKeys.has('contact_address') ? (grouped.contact.contact_address || FALLBACK_SITE_SETTINGS.contact.contact_address) : '',
+    },
+  };
+
+  const byKey = new Map<string, unknown>();
   for (const item of data ?? []) {
     byKey.set(item.key, item.value);
   }
 
-  for (const [key, value] of Object.entries({
-    site_name: settings.brand.site_name,
-    logo: settings.brand.logo,
-    site_description: settings.company.site_description,
-    footer_description: settings.company.footer_description,
-    contact_email: settings.contact.contact_email,
-    contact_phone: settings.contact.contact_phone,
-    contact_address: settings.contact.contact_address,
-  })) {
-    if (!byKey.has(key)) {
-      byKey.set(key, value);
-    }
-  }
-
-  return {
-    grouped: settings,
-    byKey,
-  };
+  return { grouped: settings, byKey };
 }
 
 export async function getHomepageSections() {
@@ -911,6 +916,55 @@ export async function getPublishedPageBySlug(slug: string) {
   };
 }
 
+export async function getPublishedPageByPath(path: string) {
+  const supabase = await createServerSupabase();
+  const normalizedPath = path.replace(/^\/+|\/+$/g, '');
+  const slugTail = normalizedPath.split('/').pop() ?? normalizedPath;
+
+  const [{ data: pages }, { data: navItems }] = await Promise.all([
+    supabase
+      .from('pages')
+      .select('*')
+      .eq('status', 'published')
+      .in('slug', Array.from(new Set([normalizedPath, slugTail]))),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
+
+  const resolvedNavItems = (navItems ?? []) as NavigationItem[];
+  const targetHref = `/${normalizedPath}`;
+  const page =
+    ((pages ?? []) as Page[]).find((candidate) => resolvePagePublicPath(candidate, resolvedNavItems) === targetHref) ??
+    ((pages ?? []) as Page[]).find((candidate) => candidate.slug === normalizedPath) ??
+    null;
+
+  if (!page) {
+    return {
+      page: null,
+      sections: [] as PageSection[],
+    };
+  }
+
+  const navigationItem = findPageNavigationItem(page, resolvedNavItems);
+  if (navigationItem && navigationItem.href !== targetHref) {
+    return {
+      page: null,
+      sections: [] as PageSection[],
+    };
+  }
+
+  const { data: sections } = await supabase
+    .from('page_sections')
+    .select('*')
+    .eq('page_id', page.id)
+    .eq('is_visible', true)
+    .order('sort_order', { ascending: true });
+
+  return {
+    page,
+    sections: (sections ?? []) as PageSection[],
+  };
+}
+
 export async function getHeroSlides() {
   const supabase = await createServerSupabase();
   const { data } = await supabase
@@ -933,9 +987,113 @@ export async function getHeroSlides() {
   });
 }
 
+function getPageSectionContent(section: PageSection) {
+  return (section.content ?? {}) as Record<string, unknown>;
+}
+
+function getPageImageCandidate(page: Page, sections: PageSection[]) {
+  for (const section of sections) {
+    const content = getPageSectionContent(section);
+    const image =
+      (typeof content.image === 'string' && content.image.trim()) ||
+      (typeof content.secondary_image === 'string' && content.secondary_image.trim()) ||
+      '';
+
+    if (image) {
+      return image;
+    }
+  }
+
+  return null;
+}
+
+function getPageExcerpt(page: Page, sections: PageSection[]) {
+  if (page.description?.trim()) {
+    return page.description.trim();
+  }
+
+  for (const section of sections) {
+    const content = getPageSectionContent(section);
+    const candidates = [content.description, content.body];
+
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+  }
+
+  return null;
+}
+
 export async function getPublishedServices(limit?: number) {
   const supabase = await createServerSupabase();
-  let query = supabase
+  const [{ data: pages }, { data: navItems }] = await Promise.all([
+    supabase.from('pages').select('*').eq('status', 'published'),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+  ]);
+
+  const headerNavItems = (navItems ?? []) as NavigationItem[];
+  const pageServices = ((pages ?? []) as Page[])
+    .map((page) => ({
+      page,
+      publicPath: resolvePagePublicPath(page, headerNavItems),
+      navItem: findPageNavigationItem(page, headerNavItems),
+    }))
+    .filter(({ publicPath }) => publicPath.startsWith('/services/') && publicPath !== '/services');
+
+  if (pageServices.length > 0) {
+    const { data: sections } = await supabase
+      .from('page_sections')
+      .select('*')
+      .in('page_id', pageServices.map(({ page }) => page.id))
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true });
+
+    const sectionsByPageId = new Map<string, PageSection[]>();
+    for (const section of (sections ?? []) as PageSection[]) {
+      const pageSections = sectionsByPageId.get(section.page_id) ?? [];
+      pageSections.push(section);
+      sectionsByPageId.set(section.page_id, pageSections);
+    }
+
+    const resolved = pageServices
+      .sort((left, right) => {
+        const leftOrder = left.navItem?.sort_order ?? Number.MAX_SAFE_INTEGER;
+        const rightOrder = right.navItem?.sort_order ?? Number.MAX_SAFE_INTEGER;
+
+        if (leftOrder !== rightOrder) {
+          return leftOrder - rightOrder;
+        }
+
+        const leftDate = new Date(left.page.published_at ?? left.page.created_at).getTime();
+        const rightDate = new Date(right.page.published_at ?? right.page.created_at).getTime();
+        return rightDate - leftDate;
+      })
+      .map(({ page }) => {
+        const pageSections = sectionsByPageId.get(page.id) ?? [];
+
+        return {
+          id: page.id,
+          title: page.title,
+          slug: page.slug,
+          excerpt: getPageExcerpt(page, pageSections),
+          content: null,
+          icon: null,
+          cover_image_url: getPageImageCandidate(page, pageSections),
+          sort_order: 0,
+          is_featured: false,
+          status: page.status,
+          published_at: page.published_at,
+          created_at: page.created_at,
+          updated_at: page.updated_at,
+        } satisfies Service;
+      });
+
+    return typeof limit === 'number' ? resolved.slice(0, limit) : resolved;
+  }
+
+  let legacyQuery = supabase
     .from('services')
     .select('*')
     .eq('status', 'published')
@@ -944,14 +1102,12 @@ export async function getPublishedServices(limit?: number) {
     .order('published_at', { ascending: false });
 
   if (typeof limit === 'number') {
-    query = query.limit(limit);
+    legacyQuery = legacyQuery.limit(limit);
   }
 
-  const { data } = await query;
+  const { data } = await legacyQuery;
   const services = ((data ?? []) as Service[]);
-  const resolved = services.length > 0 ? services : FALLBACK_SERVICES;
-
-  return typeof limit === 'number' ? resolved.slice(0, limit) : resolved;
+  return typeof limit === 'number' ? services.slice(0, limit) : services;
 }
 
 export async function getPublishedServiceBySlug(slug: string) {
@@ -963,8 +1119,7 @@ export async function getPublishedServiceBySlug(slug: string) {
     .eq('status', 'published')
     .maybeSingle();
 
-  const service = data as Service | null;
-  return service ?? FALLBACK_SERVICES.find((item) => item.slug === slug) ?? null;
+  return data as Service | null;
 }
 
 export async function getPublishedPosts(limit?: number) {

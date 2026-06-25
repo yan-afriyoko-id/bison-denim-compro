@@ -60,7 +60,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         <span ref={placeholderRef} translate="yes">Cari...</span>
         <span ref={hintRef} translate="yes">Tekan</span>
       </span>
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#1E1E1E]/50" onClick={onClose} />
       <div className="relative flex items-start justify-center pt-[25vh] px-6">
         <div className={cn('w-full max-w-2xl transition-all duration-200', isOpen ? 'opacity-100' : 'opacity-0')}>
           <div className="relative">
@@ -69,9 +69,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               ref={inputRef}
               type="text"
               placeholder={placeholder}
-              className="w-full h-12 pl-10 pr-10 border border-[#d4d4d4] bg-white text-[#111111] text-sm outline-none"
+              className="w-full h-12 pl-10 pr-10 border border-[#d4d4d4] bg-white text-[#1E1E1E] text-sm outline-none"
             />
-            <button onClick={onClose} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555555] hover:text-[#111111]">
+            <button onClick={onClose} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555555] hover:text-[#1E1E1E]">
               <X size={16} />
             </button>
           </div>

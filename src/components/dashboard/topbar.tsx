@@ -1,9 +1,9 @@
 'use client';
 
-import { signOut } from '@/actions/auth.actions';
 import { LogOut, ExternalLink } from 'lucide-react';
 import type { Profile } from '@/types';
 import Link from 'next/link';
+import { LogoutButton } from '@/components/shared/logout-button';
 
 export function DashboardTopbar({
   profile,
@@ -36,15 +36,12 @@ export function DashboardTopbar({
           <ExternalLink className="h-3.5 w-3.5" />
           View Site
         </Link>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-red-500 hover:text-red-600 transition-colors duration-200"
-          >
+        <LogoutButton className="flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-red-500 hover:text-red-600 transition-colors duration-200">
+          <>
             <LogOut className="h-3.5 w-3.5" />
             Sign Out
-          </button>
-        </form>
+          </>
+        </LogoutButton>
       </div>
     </header>
   );

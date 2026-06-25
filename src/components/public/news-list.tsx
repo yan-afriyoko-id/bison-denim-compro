@@ -20,7 +20,7 @@ export function NewsList({ posts }: { posts: Post[] }) {
           <Link
             key={item.id}
             href={`/news/${item.slug}`}
-            className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+            className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-[#1E1E1E]"
           >
             <div className="relative aspect-[4/3] bg-[#f5f5f5]">
               {item.cover_image_url ? (
@@ -38,7 +38,7 @@ export function NewsList({ posts }: { posts: Post[] }) {
                   {item.published_at ? formatDate(item.published_at, 'dd MMM yyyy') : '-'}
                 </span>
               </div>
-              <h3 className="text-sm font-bold leading-snug text-black">{item.title}</h3>
+              <h3 className="text-sm font-bold leading-snug text-[#1E1E1E]">{item.title}</h3>
               {item.excerpt && (
                 <p className="mt-2 text-xs leading-relaxed text-[#555]">{item.excerpt}</p>
               )}
@@ -52,7 +52,7 @@ export function NewsList({ posts }: { posts: Post[] }) {
           <button
             type="button"
             onClick={() => setVisibleCount((count) => count + 3)}
-            className="border border-black bg-white px-8 py-3 text-sm font-bold text-black transition-colors duration-200 hover:bg-black hover:text-white"
+            className="border border-[#1E1E1E] bg-white px-8 py-3 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:bg-[#1E1E1E] hover:text-white"
           >
             Muat Lebih
           </button>

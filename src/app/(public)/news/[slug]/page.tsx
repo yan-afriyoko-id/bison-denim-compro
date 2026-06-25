@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 import { getPostCategoryLabel } from '@/lib/public-content-shared';
 import { hasRichTextContent, RichTextRenderer } from '@/lib/rich-text';
 import { formatDate } from '@/lib/utils';
-import { getPublishedPostBySlug, normalizePostContent } from '@/lib/public-content';
+import { getPublishedPageByPath, getPublishedPostBySlug, getPublishedPosts, getPublishedServices, normalizePostContent } from '@/lib/public-content';
+import { PublicPageSections } from '@/components/public/page-sections';
+import type { PageSection } from '@/types';
 
 export default async function NewsDetailPage({
   params,
@@ -15,7 +17,17 @@ export default async function NewsDetailPage({
   const post = await getPublishedPostBySlug(slug);
 
   if (!post) {
-    notFound();
+    const [pageResult, services, posts] = await Promise.all([
+      getPublishedPageByPath(`news/${slug}`),
+      getPublishedServices(10),
+      getPublishedPosts(10),
+    ]);
+
+    if (!pageResult.page) {
+      notFound();
+    }
+
+    return <PublicPageSections sections={pageResult.sections as PageSection[]} services={services} posts={posts} />;
   }
 
   const content = normalizePostContent(post.content);
@@ -23,7 +35,7 @@ export default async function NewsDetailPage({
 
   return (
     <>
-      <section className="relative h-[340px] bg-black">
+      <section className="relative h-[340px] bg-[#1E1E1E]">
         {post.cover_image_url && (
           <Image src={post.cover_image_url} alt={post.title} fill className="object-cover opacity-60" priority />
         )}

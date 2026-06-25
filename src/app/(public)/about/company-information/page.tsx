@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPublishedPageBySlug } from '@/lib/public-content';
+import { hasRichTextContent, RichTextRenderer } from '@/lib/rich-text';
 
 function getContentValue(content: Record<string, unknown>, key: string, fallback = '') {
   const value = content[key];
@@ -38,7 +39,7 @@ export default async function CompanyInformationPage() {
 
   return (
     <>
-      <section className="relative h-[300px] bg-black">
+      <section className="relative h-[300px] bg-[#1E1E1E]">
         {getContentValue(heroContent, 'image') && (
           <Image
             src={getContentValue(heroContent, 'image')}
@@ -61,14 +62,18 @@ export default async function CompanyInformationPage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
-              <h2 className="text-2xl font-bold text-black mb-6">
+              <h2 className="text-2xl font-bold text-[#1E1E1E] mb-6">
                 {getContentValue(profileContent, 'title', 'Profil Perusahaan')}
               </h2>
-              {profileParagraphs.map((paragraph, index) => (
-                <p key={`${page.id}-profile-${index}`} className="text-[#555] text-base leading-relaxed mb-5">
-                  {paragraph}
-                </p>
-              ))}
+              {profileParagraphs.length > 0 ? (
+                profileParagraphs.map((paragraph, index) => (
+                  <p key={`${page.id}-profile-${index}`} className="text-[#555] text-base leading-relaxed mb-5">
+                    {paragraph}
+                  </p>
+                ))
+              ) : hasRichTextContent(profileContent.body) ? (
+                <RichTextRenderer content={profileContent.body} className="text-[#555] text-base leading-relaxed" />
+              ) : null}
             </div>
             <div>
               <div className="relative aspect-[4/3] border border-[#d4d4d4]">
@@ -91,7 +96,7 @@ export default async function CompanyInformationPage() {
           <div className="grid sm:grid-cols-3 gap-12 text-center">
             {statItems.map((item, index) => (
               <div key={`${page.id}-stat-${index}`}>
-                <div className="text-4xl font-bold text-black mb-2">{typeof item.value === 'string' ? item.value : ''}</div>
+                <div className="text-4xl font-bold text-[#1E1E1E] mb-2">{typeof item.value === 'string' ? item.value : ''}</div>
                 <p className="text-sm text-[#555]">{typeof item.label === 'string' ? item.label : ''}</p>
               </div>
             ))}
@@ -101,13 +106,13 @@ export default async function CompanyInformationPage() {
 
       <section className="py-24 px-6 border-t border-[#d4d4d4]">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl font-bold text-black mb-10">
+          <h2 className="text-2xl font-bold text-[#1E1E1E] mb-10">
             {getContentValue(valuesContent, 'title', 'Nilai Kami')}
           </h2>
           <div className="grid sm:grid-cols-3 gap-8">
             {valueItems.map((item, index) => (
               <div key={`${page.id}-value-${index}`}>
-                <h3 className="text-sm font-bold text-black mb-3">{typeof item.title === 'string' ? item.title : ''}</h3>
+                <h3 className="text-sm font-bold text-[#1E1E1E] mb-3">{typeof item.title === 'string' ? item.title : ''}</h3>
                 <p className="text-sm text-[#555] leading-relaxed">{typeof item.description === 'string' ? item.description : ''}</p>
               </div>
             ))}
@@ -115,13 +120,17 @@ export default async function CompanyInformationPage() {
         </div>
       </section>
 
-      <section className="py-16 px-6 bg-black">
+      <section className="py-16 px-6 bg-[#1E1E1E]">
         <div className="mx-auto max-w-7xl text-center">
           <h2 className="text-2xl font-bold text-white mb-4">{getContentValue(ctaContent, 'title', 'Hubungi Kami')}</h2>
-          <p className="text-white/70 text-sm max-w-xl mx-auto leading-relaxed mb-6">
-            {getContentValue(ctaContent, 'description')}
-          </p>
-          <Link href={getContentValue(ctaContent, 'button_href', '/contact-us')} className="inline-block bg-white text-black font-bold text-sm px-8 py-3 hover:bg-gray-100 transition-colors duration-200">
+          {hasRichTextContent(ctaContent.description) ? (
+            <RichTextRenderer content={ctaContent.description} className="mx-auto mb-6 max-w-xl text-sm leading-relaxed text-white/70 [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white" />
+          ) : (
+            <p className="text-white/70 text-sm max-w-xl mx-auto leading-relaxed mb-6">
+              {getContentValue(ctaContent, 'description')}
+            </p>
+          )}
+          <Link href={getContentValue(ctaContent, 'button_href', '/contact-us')} className="inline-block bg-white text-[#1E1E1E] font-bold text-sm px-8 py-3 hover:bg-gray-100 transition-colors duration-200">
             {getContentValue(ctaContent, 'button_label', 'Hubungi Kami')}
           </Link>
         </div>

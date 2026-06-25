@@ -28,7 +28,7 @@ export default async function PrivacyPolicyPage() {
     <>
       <section className="py-24 px-6 border-b border-[#d4d4d4]">
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-black mb-4">{page.title}</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold text-[#1E1E1E] mb-4">{page.title}</h1>
           <p className="text-[#555] text-base">Terakhir diperbarui: 1 Januari 2026</p>
         </div>
       </section>
@@ -38,7 +38,7 @@ export default async function PrivacyPolicyPage() {
           <div className="space-y-8">
             {contentBlocks.map((block, index) => (
               <div key={`${page.id}-privacy-${index}`}>
-                <h2 className="text-xl font-bold text-black mb-3">{block.title}</h2>
+                <h2 className="text-xl font-bold text-[#1E1E1E] mb-3">{block.title}</h2>
                 {isRichTextDocument(block.body) ? (
                   <RichTextRenderer content={block.body} className="text-[#555] text-base leading-relaxed" />
                 ) : (

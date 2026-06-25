@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { slugify } from '@/lib/utils';
 import { updatePost, deletePost } from '@/actions/posts.actions';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Post, RichTextDocument } from '@/types';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { ImageInput } from '@/components/dashboard/image-input';
 import { RichTextEditor } from '@/components/dashboard/rich-text-editor';
 import { RichTextRenderer, normalizeRichTextValue } from '@/lib/rich-text';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 export default function EditPostPage() {
   const router = useRouter();
@@ -79,8 +80,6 @@ export default function EditPostPage() {
 
   async function handleDelete() {
     if (!post) return;
-    if (!confirm('Delete this post?')) return;
-
     const result = await deletePost(post.id);
     if (result.error) {
       toast.error(result.error);
@@ -127,6 +126,16 @@ export default function EditPostPage() {
         </Link>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Edit Post</h1>
         <p className="text-sm text-gray-400 mt-1">Update the article or news post.</p>
+        <div className="mt-4">
+          <Link
+            href={`/preview/posts/${post.id}`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-sm border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:border-gray-900 hover:text-gray-900"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Preview
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
@@ -261,14 +270,17 @@ export default function EditPostPage() {
 
           {/* Actions */}
           <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={handleDelete}
+            <ConfirmButton
+              title="Delete Post"
+              description="This post will be removed permanently."
+              confirmLabel="Delete Post"
+              variant="destructive"
               className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 transition-colors"
+              onConfirm={handleDelete}
             >
               <Trash2 className="h-3.5 w-3.5" />
               Delete Post
-            </button>
+            </ConfirmButton>
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard/posts"
@@ -279,7 +291,7 @@ export default function EditPostPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
+                className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-[#1E1E1E] transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>

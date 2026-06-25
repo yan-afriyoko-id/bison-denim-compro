@@ -20,8 +20,8 @@ export function ContentGrowthChart({ data }: ContentGrowthChartProps) {
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorPages" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#111111" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#111111" stopOpacity={0} />
+              <stop offset="5%" stopColor="#1E1E1E" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#1E1E1E" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorPosts" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#9ca3af" stopOpacity={0.25} />
@@ -49,7 +49,7 @@ export function ContentGrowthChart({ data }: ContentGrowthChartProps) {
               border: '1px solid #e5e7eb',
               borderRadius: '4px',
               fontSize: '12px',
-              color: '#111111',
+              color: '#1E1E1E',
               boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             }}
             labelStyle={{ color: '#6b7280', marginBottom: '4px' }}
@@ -57,7 +57,7 @@ export function ContentGrowthChart({ data }: ContentGrowthChartProps) {
           <Area
             type="monotone"
             dataKey="pages"
-            stroke="#111111"
+            stroke="#1E1E1E"
             strokeWidth={2}
             fill="url(#colorPages)"
             name="Pages"

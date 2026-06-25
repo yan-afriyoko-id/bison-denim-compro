@@ -211,7 +211,7 @@ export default function NewPostPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
+              className="bg-gray-900 text-white px-5 py-2 text-sm font-bold rounded-sm hover:bg-[#1E1E1E] transition-colors disabled:opacity-50"
             >
               {isSubmitting ? 'Saving...' : 'Save'}
             </button>

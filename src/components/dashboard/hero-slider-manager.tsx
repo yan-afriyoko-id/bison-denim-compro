@@ -41,6 +41,7 @@ import {
 } from '@/actions/homepage.actions';
 import { ImageInput } from '@/components/dashboard/image-input';
 import type { HeroSlideRecord } from '@/lib/homepage';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 
 interface Slide extends HeroSlideRecord, HeroSlideData {}
 
@@ -155,13 +156,17 @@ function SortableSlide({
         >
           <Pencil className="h-4 w-4" />
         </button>
-        <button
-          onClick={() => onDelete(slide.id)}
+        <ConfirmButton
+          title="Delete Slide"
+          description="This hero slide will be removed permanently."
+          confirmLabel="Delete Slide"
+          variant="destructive"
           className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-200 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
-          title="Delete"
+          buttonTitle="Delete"
+          onConfirm={() => onDelete(slide.id)}
         >
           <Trash2 className="h-4 w-4" />
-        </button>
+        </ConfirmButton>
       </div>
     </div>
   );
@@ -233,7 +238,7 @@ function SlideForm({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1E1E]/40 p-4">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-sm border border-gray-200 bg-white shadow-xl">
         <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900">
@@ -363,7 +368,7 @@ function SlideForm({
             <button
               type="submit"
               disabled={pending}
-              className="rounded-sm bg-gray-900 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-black disabled:opacity-50"
+              className="rounded-sm bg-gray-900 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-[#1E1E1E] disabled:opacity-50"
             >
               {pending ? 'Saving...' : mode === 'create' ? 'Add Slide' : 'Save Changes'}
             </button>
@@ -435,7 +440,6 @@ export function HeroSliderManager({ initialSlides }: { initialSlides: Slide[] })
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this slide?')) return;
     const result = await deleteHeroSlide(id);
     if (result.error) {
       toast.error(result.error);
@@ -479,7 +483,7 @@ export function HeroSliderManager({ initialSlides }: { initialSlides: Slide[] })
           </a>
           <button
             onClick={handleCreate}
-            className="flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+            className="flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
           >
             <Plus className="h-4 w-4" />
             Add Slide
@@ -496,7 +500,7 @@ export function HeroSliderManager({ initialSlides }: { initialSlides: Slide[] })
           <p className="mb-4 text-sm text-gray-500">No slides yet</p>
           <button
             onClick={handleCreate}
-            className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+            className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
           >
             <Plus className="h-4 w-4" />
             Add First Slide

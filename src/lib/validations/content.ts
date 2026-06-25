@@ -8,7 +8,6 @@ export const pageSchema = z.object({
   locale: z.string().default('id'),
   seo_title: z.string().optional().nullable(),
   seo_description: z.string().optional().nullable(),
-  og_image_url: z.string().optional().nullable(),
   is_indexed: z.boolean().default(true),
 });
 

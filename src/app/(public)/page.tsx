@@ -71,7 +71,7 @@ function renderSection(
         <section key={section.id} className="px-6 py-24">
           <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <h2 className="mb-6 text-3xl font-bold leading-tight text-black sm:text-4xl">
+              <h2 className="mb-6 text-3xl font-bold leading-tight text-[#1E1E1E] sm:text-4xl">
                 {getText(content.title, 'About Us')}
               </h2>
               <RichTextRenderer
@@ -81,7 +81,7 @@ function renderSection(
               {getText(content.link_label) && getText(content.link_href) && (
                 <Link
                   href={getText(content.link_href)}
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-black transition-colors duration-200 hover:opacity-60"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:opacity-60"
                 >
                   {getText(content.link_label)} &rarr;
                 </Link>
@@ -122,7 +122,7 @@ function renderSection(
         <section key={section.id} className="bg-[#f5f5f5] px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="mb-14">
-              <h2 className="text-3xl font-bold text-black sm:text-4xl">
+              <h2 className="text-3xl font-bold text-[#1E1E1E] sm:text-4xl">
                 {getText(content.title, 'Our Products')}
               </h2>
               <RichTextRenderer
@@ -135,7 +135,7 @@ function renderSection(
                 <Link
                   key={item.id}
                   href={`/services/${item.slug}`}
-                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-[#1E1E1E]"
                 >
                   <div className="relative aspect-[4/3] bg-[#f5f5f5]">
                     {item.cover_image_url ? (
@@ -145,7 +145,7 @@ function renderSection(
                     )}
                   </div>
                   <div className="p-5">
-                    <h3 className="mb-1.5 text-sm font-bold text-black">{item.title}</h3>
+                    <h3 className="mb-1.5 text-sm font-bold text-[#1E1E1E]">{item.title}</h3>
                     <p className="text-xs leading-relaxed text-[#555]">{item.excerpt ?? ''}</p>
                   </div>
                 </Link>
@@ -164,7 +164,7 @@ function renderSection(
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 flex items-end justify-between gap-6">
               <div>
-                <h2 className="text-3xl font-bold text-black sm:text-4xl">
+                <h2 className="text-3xl font-bold text-[#1E1E1E] sm:text-4xl">
                   {getText(content.title, 'Latest News')}
                 </h2>
                 <RichTextRenderer
@@ -172,7 +172,7 @@ function renderSection(
                   className="mt-3 text-base leading-relaxed text-[#555]"
                 />
               </div>
-              <Link href="/news" className="text-sm font-bold text-black transition-colors duration-200 hover:opacity-60">
+              <Link href="/news" className="text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:opacity-60">
                 View All &rarr;
               </Link>
             </div>
@@ -181,7 +181,7 @@ function renderSection(
                 <Link
                   key={item.id}
                   href={`/news/${item.slug}`}
-                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-black"
+                  className="card-interactive block border border-[#d4d4d4] bg-white transition-colors duration-200 hover:border-[#1E1E1E]"
                 >
                   <div className="relative aspect-[4/3] bg-[#f5f5f5]">
                     {item.cover_image_url ? (
@@ -194,7 +194,7 @@ function renderSection(
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[#555]">
                       {getPostCategoryLabel(item)}
                     </span>
-                    <h3 className="mt-1 text-sm font-bold leading-snug text-black">{item.title}</h3>
+                    <h3 className="mt-1 text-sm font-bold leading-snug text-[#1E1E1E]">{item.title}</h3>
                   </div>
                 </Link>
               ))}
@@ -205,18 +205,18 @@ function renderSection(
     }
     case 'cta':
       return (
-        <section key={section.id} className="bg-black px-6 py-24">
+        <section key={section.id} className="bg-[#1E1E1E] px-6 py-24">
           <div className="mx-auto max-w-7xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-white">
               {getText(content.title, 'Contact Us')}
             </h2>
             <RichTextRenderer
               content={hasRichTextContent(content.description) ? content.description : ''}
-              className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white/70 [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white"
+              className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_a]:text-white"
             />
             <Link
               href={getText(content.button_href, '/contact-us')}
-              className="inline-flex items-center gap-2 bg-white px-6 py-3 text-sm font-bold text-black transition-colors duration-200 hover:bg-gray-100"
+              className="inline-flex items-center gap-2 bg-white px-6 py-3 text-sm font-bold text-[#1E1E1E] transition-colors duration-200 hover:bg-gray-100"
             >
               {getText(content.button_label, 'Contact Us')} &rarr;
             </Link>

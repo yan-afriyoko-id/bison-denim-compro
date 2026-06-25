@@ -3,10 +3,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { hasRichTextContent, RichTextRenderer } from '@/lib/rich-text';
 import {
+  getPublishedPageByPath,
   getPublishedServiceBySlug,
   getPublicSiteSettings,
+  getPublishedPosts,
+  getPublishedServices,
   normalizeServiceContent,
 } from '@/lib/public-content';
+import { PublicPageSections } from '@/components/public/page-sections';
+import type { PageSection } from '@/types';
 
 export default async function ProductDetailPage({
   params,
@@ -14,6 +19,16 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const [pageResult, services, posts] = await Promise.all([
+    getPublishedPageByPath(`services/${slug}`),
+    getPublishedServices(10),
+    getPublishedPosts(10),
+  ]);
+
+  if (pageResult.page) {
+    return <PublicPageSections sections={pageResult.sections as PageSection[]} services={services} posts={posts} />;
+  }
+
   const [service, { grouped }] = await Promise.all([
     getPublishedServiceBySlug(slug),
     getPublicSiteSettings(),
@@ -31,7 +46,7 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <section className="relative h-[300px] bg-black">
+      <section className="relative h-[300px] bg-[#1E1E1E]">
         {service.cover_image_url && (
           <Image src={service.cover_image_url} alt={service.title} fill className="object-cover opacity-60" priority />
         )}
@@ -47,7 +62,7 @@ export default async function ProductDetailPage({
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-16 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <h2 className="mb-5 text-2xl font-bold text-black">Tentang Produk Ini</h2>
+              <h2 className="mb-5 text-2xl font-bold text-[#1E1E1E]">Tentang Produk Ini</h2>
               <RichTextRenderer
                 content={bodyContent}
                 className="text-base leading-relaxed text-[#555]"
@@ -55,7 +70,7 @@ export default async function ProductDetailPage({
             </div>
             <div>
               <div className="border border-[#d4d4d4] p-6">
-                <h3 className="mb-4 text-sm font-bold text-black">Keunggulan</h3>
+                <h3 className="mb-4 text-sm font-bold text-[#1E1E1E]">Keunggulan</h3>
                 {hasFeatures ? (
                   <RichTextRenderer
                     content={content.features}
@@ -71,7 +86,7 @@ export default async function ProductDetailPage({
               <div className="mt-6">
                 <Link
                   href={ctaHref}
-                  className="block w-full bg-black py-3 text-center text-sm font-bold text-white transition-colors duration-200 hover:bg-[#333]"
+                  className="block w-full bg-[#1E1E1E] py-3 text-center text-sm font-bold text-white transition-colors duration-200 hover:bg-[#333]"
                 >
                   {ctaLabel}
                 </Link>

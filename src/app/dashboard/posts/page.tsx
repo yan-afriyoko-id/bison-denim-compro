@@ -93,7 +93,7 @@ export default async function PostsPage({
             />
             <Link
               href="/dashboard/posts/new"
-              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-black"
+              className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1E1E1E]"
             >
               <Plus className="h-4 w-4" />
               New Post
@@ -135,7 +135,7 @@ function PostRow({ post }: { post: Awaited<ReturnType<typeof getPosts>>['items']
     <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <Link href={`/dashboard/posts/${post.id}`} className="text-sm font-bold text-gray-900 hover:text-black transition-colors">
+          <Link href={`/dashboard/posts/${post.id}`} className="text-sm font-bold text-gray-900 hover:text-[#1E1E1E] transition-colors">
             {post.title}
           </Link>
           <span className={`inline-block rounded-sm border px-2 py-0.5 text-[11px] font-medium ${statusStyles[post.status] ?? statusStyles.draft}`}>

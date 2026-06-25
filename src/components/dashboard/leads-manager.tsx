@@ -201,7 +201,7 @@ export function LeadsManager({
       )}
 
       {activeLead && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1E1E]/30 p-4">
           <div className="w-full max-w-3xl rounded-sm border border-gray-200 bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <div>
@@ -276,7 +276,7 @@ export function LeadsManager({
                   type="button"
                   onClick={() => startTransition(() => void persistLead())}
                   disabled={isPending}
-                  className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-black disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-[#1E1E1E] disabled:opacity-50"
                 >
                   <Save className="h-3.5 w-3.5" />
                   Simpan Perubahan
