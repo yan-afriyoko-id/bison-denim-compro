@@ -16,6 +16,16 @@ export interface PublicNavItem extends NavigationItem {
   children: PublicNavItem[];
 }
 
+export interface PublicSearchItem {
+  id: string;
+  title: string;
+  href: string;
+  description: string;
+  type: 'page' | 'service' | 'post';
+  imageUrl: string | null;
+  publishedAt: string | null;
+}
+
 export interface NormalizedServiceContent {
   text: RichTextDocument | string;
   features: RichTextDocument | string[];
@@ -1045,6 +1055,58 @@ function getPageExcerpt(page: Page, sections: PageSection[]) {
   return null;
 }
 
+function collectTextFragments(value: unknown): string[] {
+  if (typeof value === 'string') {
+    return [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectTextFragments(item));
+  }
+
+  if (!value || typeof value !== 'object') {
+    return [];
+  }
+
+  const entry = value as { text?: unknown; content?: unknown; [key: string]: unknown };
+  const fragments: string[] = [];
+
+  if (typeof entry.text === 'string') {
+    fragments.push(entry.text);
+  }
+
+  if (Array.isArray(entry.content)) {
+    fragments.push(...entry.content.flatMap((item) => collectTextFragments(item)));
+  }
+
+  for (const nestedValue of Object.values(entry)) {
+    if (nestedValue !== entry.text && nestedValue !== entry.content) {
+      fragments.push(...collectTextFragments(nestedValue));
+    }
+  }
+
+  return fragments;
+}
+
+function sanitizeSearchText(value: string) {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+function getPageSearchDescription(page: Page, sections: PageSection[]) {
+  const excerpt = getPageExcerpt(page, sections);
+  if (excerpt) {
+    return sanitizeSearchText(excerpt);
+  }
+
+  const sectionText = sanitizeSearchText(
+    sections
+      .flatMap((section) => collectTextFragments(section.content))
+      .join(' ')
+  );
+
+  return sectionText;
+}
+
 export async function getPublishedServices(limit?: number) {
   const supabase = await createServerSupabase();
   const [{ data: pages }, { data: navItems }] = await Promise.all([
@@ -1172,6 +1234,84 @@ export async function getPublishedPostBySlug(slug: string) {
 
   const post = data as Post | null;
   return post ?? FALLBACK_POSTS.find((item) => item.slug === slug) ?? null;
+}
+
+export async function getPublicSearchItems() {
+  const supabase = await createServerSupabase();
+  const [{ data: pages }, { data: navItems }, { data: sections }, services, posts] = await Promise.all([
+    supabase.from('pages').select('*').eq('status', 'published'),
+    supabase.from('navigation_items').select('*').eq('location', 'header'),
+    supabase.from('page_sections').select('*').eq('is_visible', true).order('sort_order', { ascending: true }),
+    getPublishedServices(),
+    getPublishedPosts(),
+  ]);
+
+  const headerNavItems = (navItems ?? []) as NavigationItem[];
+  const publishedPages = (pages ?? []) as Page[];
+  const visibleSections = (sections ?? []) as PageSection[];
+  const sectionsByPageId = new Map<string, PageSection[]>();
+
+  for (const section of visibleSections) {
+    const pageSections = sectionsByPageId.get(section.page_id) ?? [];
+    pageSections.push(section);
+    sectionsByPageId.set(section.page_id, pageSections);
+  }
+
+  const pageItems = publishedPages
+    .filter((page) => page.page_key !== 'home' && page.slug !== 'home')
+    .map((page) => {
+      const pageSections = sectionsByPageId.get(page.id) ?? [];
+
+      return {
+        id: `page-${page.id}`,
+        title: page.title,
+        href: resolvePagePublicPath(page, headerNavItems),
+        description: getPageSearchDescription(page, pageSections),
+        type: 'page',
+        imageUrl: getPageImageCandidate(page, pageSections),
+        publishedAt: page.published_at,
+      } satisfies PublicSearchItem;
+    });
+
+  const serviceItems = services.map((service) => ({
+    id: `service-${service.id}`,
+    title: service.title,
+    href: `/services/${service.slug}`,
+    description: sanitizeSearchText(service.excerpt ?? ''),
+    type: 'service',
+    imageUrl: service.cover_image_url,
+    publishedAt: service.published_at,
+  } satisfies PublicSearchItem));
+
+  const postItems = posts.map((post) => ({
+    id: `post-${post.id}`,
+    title: post.title,
+    href: `/news/${post.slug}`,
+    description: sanitizeSearchText(post.excerpt ?? ''),
+    type: 'post',
+    imageUrl: post.cover_image_url,
+    publishedAt: post.published_at,
+  } satisfies PublicSearchItem));
+
+  const deduped = new Map<string, PublicSearchItem>();
+
+  for (const item of [...pageItems, ...serviceItems, ...postItems]) {
+    const key = `${item.href}::${item.title.toLowerCase()}`;
+    if (!deduped.has(key)) {
+      deduped.set(key, item);
+    }
+  }
+
+  return Array.from(deduped.values()).sort((left, right) => {
+    const leftDate = left.publishedAt ? new Date(left.publishedAt).getTime() : 0;
+    const rightDate = right.publishedAt ? new Date(right.publishedAt).getTime() : 0;
+
+    if (leftDate !== rightDate) {
+      return rightDate - leftDate;
+    }
+
+    return left.title.localeCompare(right.title);
+  });
 }
 
 export function getSettingTextValue(value: unknown) {

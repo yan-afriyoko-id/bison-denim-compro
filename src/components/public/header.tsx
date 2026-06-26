@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { Search, ChevronDown, Globe, Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { SearchOverlay } from './search-overlay';
 import { createClient } from '@/lib/supabase/client';
-import type { PublicNavItem } from '@/lib/public-content';
+import type { PublicNavItem, PublicSearchItem } from '@/lib/public-content';
 import { LogoutButton } from '@/components/shared/logout-button';
 
 const SOURCE_LANGUAGE = 'id';
@@ -160,10 +160,12 @@ function isInternalHref(href: string) {
 
 export function Header({
   navigation,
+  searchItems,
   siteName,
   logoUrl,
 }: {
   navigation: PublicNavItem[];
+  searchItems: PublicSearchItem[];
   siteName: string;
   logoUrl?: string;
 }) {
@@ -418,14 +420,7 @@ export function Header({
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                href="/auth/login"
-                className="navbar-interactive hidden h-9 items-center gap-1.5 rounded-sm border border-[#1E1E1E] bg-white px-4 text-sm font-semibold text-[#1E1E1E] transition-colors duration-300 ease-out hover:bg-[#1E1E1E] hover:text-white md:flex"
-              >
-                Login
-              </Link>
-            )}
+            ) : null}
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -516,15 +511,7 @@ export function Header({
                     </>
                   </LogoutButton>
                 </div>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="navbar-interactive mb-3 flex h-10 items-center justify-center border border-[#1E1E1E] bg-white text-sm font-semibold text-[#1E1E1E] transition-colors duration-300 ease-out hover:bg-[#1E1E1E] hover:text-white"
-                >
-                  Login
-                </Link>
-              )}
+              ) : null}
               <p className="text-xs font-semibold uppercase tracking-wider text-[#999] mb-3">Bahasa</p>
               <div className="space-y-1">
                 {localeKeys.map((locale) => (
@@ -550,7 +537,11 @@ export function Header({
         </>
       )}
 
-      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlay
+        isOpen={searchOpen}
+        items={searchItems}
+        onClose={() => setSearchOpen(false)}
+      />
     </>
   );
 }

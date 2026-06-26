@@ -3,7 +3,7 @@ import { getCurrentProfile } from '@/lib/auth/helpers';
 import { Header } from '@/components/public/header';
 import { Footer } from '@/components/public/footer';
 import { GoogleTranslateScripts } from '@/components/public/google-translate-scripts';
-import { getNavigationTree, getPublicSiteSettings } from '@/lib/public-content';
+import { getNavigationTree, getPublicSearchItems, getPublicSiteSettings } from '@/lib/public-content';
 
 export default async function PreviewLayout({
   children,
@@ -16,8 +16,9 @@ export default async function PreviewLayout({
     redirect('/auth/login');
   }
 
-  const [navigation, { grouped }] = await Promise.all([
+  const [navigation, searchItems, { grouped }] = await Promise.all([
     getNavigationTree('header'),
+    getPublicSearchItems(),
     getPublicSiteSettings(),
   ]);
 
@@ -29,7 +30,12 @@ export default async function PreviewLayout({
           Preview Mode
         </div>
       </div>
-      <Header navigation={navigation} siteName={grouped.brand.site_name} logoUrl={grouped.brand.logo} />
+      <Header
+        navigation={navigation}
+        searchItems={searchItems}
+        siteName={grouped.brand.site_name}
+        logoUrl={grouped.brand.logo}
+      />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

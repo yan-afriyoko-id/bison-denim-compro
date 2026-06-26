@@ -1,15 +1,16 @@
 import { Header } from '@/components/public/header';
 import { Footer } from '@/components/public/footer';
 import { GoogleTranslateScripts } from '@/components/public/google-translate-scripts';
-import { getNavigationTree, getPublicSiteSettings } from '@/lib/public-content';
+import { getNavigationTree, getPublicSearchItems, getPublicSiteSettings } from '@/lib/public-content';
 
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [navigation, { grouped }] = await Promise.all([
+  const [navigation, searchItems, { grouped }] = await Promise.all([
     getNavigationTree('header'),
+    getPublicSearchItems(),
     getPublicSiteSettings(),
   ]);
 
@@ -18,6 +19,7 @@ export default async function PublicLayout({
       <GoogleTranslateScripts />
       <Header
         navigation={navigation}
+        searchItems={searchItems}
         siteName={grouped.brand.site_name}
         logoUrl={grouped.brand.logo}
       />
