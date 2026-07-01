@@ -207,9 +207,9 @@ export function SearchOverlay({ isOpen, items, onClose }: SearchOverlayProps) {
         <span ref={suggestionSubtitleRef} translate="yes">Pilih halaman, produk, atau berita yang ingin dibuka.</span>
         <span ref={emptyStateRef} translate="yes">Tidak ada hasil yang cocok.</span>
       </span>
-      <div className="absolute inset-0 bg-[#1E1E1E]/50" onClick={onClose} />
-      <div className="relative flex items-start justify-center pt-[25vh] px-6">
-        <div className={cn('w-full max-w-2xl transition-all duration-200', isOpen ? 'opacity-100' : 'opacity-0')}>
+      <div className="absolute inset-0 bg-[#1E1E1E]/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative flex items-start justify-center pt-[12vh] px-6">
+        <div className={cn('w-full max-w-2xl transition-all duration-200', isOpen ? 'opacity-100' : 'opacity-0')} onClick={(e) => e.stopPropagation()}>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999999]" />
             <input
