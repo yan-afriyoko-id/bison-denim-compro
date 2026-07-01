@@ -198,7 +198,7 @@ export function SearchOverlay({ isOpen, items, onClose }: SearchOverlayProps) {
   const showRecommendations = normalizedQuery.length === 0;
 
   return (
-    <div className={cn('fixed inset-0 z-[60] transition-opacity duration-200', isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0')}>
+    <div className={cn('fixed inset-0 z-[60] transition-opacity duration-200', isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0')} onClick={onClose}>
       {/* Source strings for the translator. Visually hidden but parsed by Google Translate. */}
       <span aria-hidden="true" className="sr-only">
         <span ref={placeholderRef} translate="yes">Cari...</span>
@@ -207,7 +207,7 @@ export function SearchOverlay({ isOpen, items, onClose }: SearchOverlayProps) {
         <span ref={suggestionSubtitleRef} translate="yes">Pilih halaman, produk, atau berita yang ingin dibuka.</span>
         <span ref={emptyStateRef} translate="yes">Tidak ada hasil yang cocok.</span>
       </span>
-      <div className="absolute inset-0 bg-[#1E1E1E]/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#1E1E1E]/50 backdrop-blur-sm" />
       <div className="relative flex items-start justify-center pt-[12vh] px-6">
         <div className={cn('w-full max-w-2xl transition-all duration-200', isOpen ? 'opacity-100' : 'opacity-0')} onClick={(e) => e.stopPropagation()}>
           <div className="relative">
